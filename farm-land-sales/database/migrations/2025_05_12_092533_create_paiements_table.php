@@ -1,3 +1,4 @@
+// Update database/migrations/2025_05_12_092533_create_paiements_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,20 +7,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('paiements', function (Blueprint $table) {
             $table->id();
+            $table->string('methode');
+            $table->string('reference')->nullable();
+            $table->string('detail')->nullable();
+            $table->double('total');
+            $table->boolean('verified')->default(false);
+            $table->boolean('complet')->default(false);
+            $table->unsignedBigInteger('transactionId');
+            $table->datetime('dateTime');
+            $table->foreign('transactionId')->references('id')->on('transactions')->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('paiements');

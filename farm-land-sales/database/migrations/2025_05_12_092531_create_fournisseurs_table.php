@@ -1,3 +1,4 @@
+// Update database/migrations/2025_05_12_092531_create_fournisseurs_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,20 +7,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('fournisseurs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('nom');
+            $table->string('prenom');
+            $table->string('entreprise');
+            $table->string('telephone');
+            $table->text('adresse');
+            $table->text('description');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('fournisseurs');

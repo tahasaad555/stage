@@ -9,11 +9,13 @@ class Favoris extends Model
 {
     use HasFactory;
 
+    protected $table = 'favoris';
+    
     protected $fillable = [
         'client_id',
         'terrain_id',
         'equipment_id',
-        'type'
+        'type'  // 'terrain' or 'equipment'
     ];
 
     public function client()

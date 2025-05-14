@@ -1,3 +1,4 @@
+// Update database/migrations/2025_05_12_102045_create_notifications_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,8 +14,8 @@ class CreateNotificationsTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('type');
             $table->text('contenu');
-            $table->timestamp('dateCreation');
             $table->boolean('lu')->default(false);
+            $table->timestamp('dateCreation');
             $table->timestamps();
         });
     }
