@@ -76,4 +76,6 @@ public function hasRole($role)
     return false;
 }
 
+
+
 }

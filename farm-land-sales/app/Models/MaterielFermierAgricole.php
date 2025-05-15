@@ -27,4 +27,9 @@ class MaterielFermierAgricole extends Model
     {
         return $this->belongsTo(Annonce::class, 'annonceId');
     }
+
+    public function fournisseur()
+{
+    return $this->belongsTo(Fournisseur::class, 'fournisseurId');
+}
 }

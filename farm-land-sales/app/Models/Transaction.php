@@ -40,4 +40,9 @@ class Transaction extends Model
     {
         return $this->hasMany(Paiement::class, 'transactionId');
     }
+
+    public function materiel()
+{
+    return $this->belongsTo(MaterielFermierAgricole::class, 'materielId');
+}
 }
