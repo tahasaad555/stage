@@ -1,79 +1,30 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'AgriLand') }}</title>
-    
-    <!-- Livewire Styles -->
-    @livewireStyles
-    
-    <!-- Custom CSS -->
-    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-</head>
-<body>
-    <header class="guest-header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <a href="/">AgriLand</a>
-                </div>
-                <nav class="guest-nav">
-                    <ul>
-                        <li><a href="{{ route('lands.search') }}">Lands</a></li>
-                        <li><a href="{{ route('equipment.search') }}">Equipment</a></li>
-                        <li><a href="{{ route('login') }}">Login</a></li>
-                        <li><a href="{{ route('register') }}" class="button button-small">Register</a></li>
-                    </ul>
-                </nav>
+        <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans text-gray-900 antialiased">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
+            <div>
+                <a href="/" wire:navigate>
+                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                </a>
+            </div>
+
+            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+                {{ $slot }}
             </div>
         </div>
-    </header>
-
-    <main>
-        {{ $slot }}
-    </main>
-
-    <footer class="guest-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <h2>AgriLand</h2>
-                    <p>Your one-stop platform for agricultural lands and farming equipment.</p>
-                </div>
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h3>Explore</h3>
-                        <ul>
-                            <li><a href="{{ route('lands.search') }}">Agricultural Lands</a></li>
-                            <li><a href="{{ route('equipment.search') }}">Farm Equipment</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h3>Account</h3>
-                        <ul>
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h3>Contact</h3>
-                        <ul>
-                            <li>Email: info@agriland.com</li>
-                            <li>Phone: +123 456 7890</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; {{ date('Y') }} AgriLand. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Livewire Scripts -->
-    @livewireScripts
-</body>
+    </body>
 </html>

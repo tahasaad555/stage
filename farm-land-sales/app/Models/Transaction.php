@@ -10,14 +10,14 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'dateTransaction',
         'montant',
         'statut',
         'methodePaiement',
         'commission',
         'annonceId',
-        'clientId'
+        'clientId',
+        'materielId'
     ];
 
     protected $casts = [
@@ -42,7 +42,7 @@ class Transaction extends Model
     }
 
     public function materiel()
-{
-    return $this->belongsTo(MaterielFermierAgricole::class, 'materielId');
-}
+    {
+        return $this->belongsTo(MaterielFermierAgricole::class, 'materielId');
+    }
 }

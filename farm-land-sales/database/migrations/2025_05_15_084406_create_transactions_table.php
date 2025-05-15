@@ -1,4 +1,3 @@
-// Update database/migrations/2025_05_12_092532_create_transactions_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -18,8 +17,10 @@ return new class extends Migration
             $table->double('commission')->nullable();
             $table->unsignedBigInteger('annonceId')->nullable();
             $table->unsignedBigInteger('clientId');
+            $table->unsignedBigInteger('materielId')->nullable();
             $table->foreign('annonceId')->references('id')->on('annonces')->onDelete('set null');
             $table->foreign('clientId')->references('id')->on('clients')->onDelete('cascade');
+            $table->foreign('materielId')->references('id')->on('materiels_fermier_agricoles')->onDelete('set null');
             $table->timestamps();
         });
     }

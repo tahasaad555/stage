@@ -11,8 +11,8 @@ class CreateFavorisTable extends Migration
         Schema::create('favoris', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
-            $table->foreignId('terrain_id')->nullable()->constrained('terrain_agricoles')->onDelete('cascade');
-            $table->foreignId('equipment_id')->nullable()->constrained('materiel_fermier_agricoles')->onDelete('cascade');
+            $table->foreignId('terrain_id')->nullable()->constrained('terrains_agricoles')->onDelete('cascade');
+            $table->foreignId('equipment_id')->nullable()->constrained('materiels_fermier_agricoles')->onDelete('cascade');
             $table->string('type'); // 'terrain' or 'equipment'
             $table->timestamps();
         });

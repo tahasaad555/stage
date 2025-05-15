@@ -1,4 +1,3 @@
-// Update database/migrations/2025_05_12_092532_create_terrains_agricoles_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -23,7 +22,9 @@ return new class extends Migration
             $table->string('images')->nullable();
             $table->boolean('visible')->default(true);
             $table->string('type')->nullable();
+            $table->unsignedBigInteger('annonceId')->nullable();
             $table->foreign('proprietaireId')->references('id')->on('clients')->onDelete('cascade');
+            $table->foreign('annonceId')->references('id')->on('annonces')->onDelete('set null');
             $table->timestamps();
         });
     }

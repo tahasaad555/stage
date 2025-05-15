@@ -17,29 +17,4 @@ class Administrateur extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function includeAnnonce()
-    {
-        // Implementation
-    }
-
-    public function gererUtilisateur()
-    {
-        // Implementation
-    }
-
-    public function retirerCompte()
-    {
-        // Implementation
-    }
-
-    public function suspendreCompte()
-    {
-        // Implementation
-    }
-
-    public function gererCommission()
-    {
-        // Implementation
-    }
 }

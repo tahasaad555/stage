@@ -10,7 +10,6 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'contenu',
         'dateEnvoi',
         'lu',

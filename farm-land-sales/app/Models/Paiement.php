@@ -10,18 +10,21 @@ class Paiement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'methode',
-        'dateTime',
+        'reference',
+        'detail',
         'total',
         'verified',
-        'transactionId'
+        'complet',
+        'transactionId',
+        'dateTime'
     ];
 
     protected $casts = [
         'dateTime' => 'datetime',
         'total' => 'double',
         'verified' => 'boolean',
+        'complet' => 'boolean',
     ];
 
     public function transaction()

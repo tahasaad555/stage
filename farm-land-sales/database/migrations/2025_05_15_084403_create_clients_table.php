@@ -1,4 +1,3 @@
-// Update database/migrations/2025_05_12_092531_create_clients_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;

@@ -31,9 +31,4 @@ class Avis extends Model
     {
         return $this->belongsTo(TerrainAgricole::class, 'terrainId');
     }
-
-    public function publier()
-    {
-        // Implementation
-    }
 }

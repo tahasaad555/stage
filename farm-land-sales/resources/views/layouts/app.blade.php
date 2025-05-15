@@ -1,86 +1,36 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Land & Farming Materials Platform</title>
-    
-    <!-- Livewire Styles -->
-    @livewireStyles
-    
-    <!-- Custom CSS -->
-    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
-</head>
-<body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>AgriLand</h1>
-            </div>
-         <nav>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="{{ route('lands.search') }}">Agricultural Lands</a></li>
-        <li><a href="{{ route('equipment.search') }}">Farm Equipment</a></li>
-        <li><a href="{{ route('announcements.create') }}">Create Listing</a></li>
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle">My Account</a>
-            <div class="dropdown-menu">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <a href="{{ route('favorites') }}">My Favorites</a>
-                <a href="{{ route('messages.inbox') }}">Messages</a>
-                <a href="{{ route('transactions') }}">Transactions</a>
-              <a href="{{ route('notifications') }}" class="notification-link">
-   
-             Notifications
-    @php
-        $unreadCount = \App\Models\Notification::where('user_id', Auth::id())
-                                             ->where('lu', false)
-                                             ->count();
-    @endphp
-    
-    @if($unreadCount > 0)
-        <span class="notification-badge">{{ $unreadCount }}</span>
-    @endif
-</a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit">Logout</button>
-                </form>
-            </div>
-        </li>
-    </ul>
-</nav>
-            <div class="user-menu">
-                <!-- Will be dynamic based on authentication -->
-                @auth
-                    <a href="/dashboard">Dashboard</a>
-                    <a href="/messages">Messages</a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit">Logout</button>
-                    </form>
-                @else
-                    <a href="/login">Login</a>
-                    <a href="/register">Register</a>
-                @endauth
-            </div>
-        </div>
-    </header>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <main>
-        <div class="container">
-            {{ $slot }}
-        </div>
-    </main>
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <footer>
-        <div class="container">
-            <p>&copy; {{ date('Y') }} AgriLand. All rights reserved.</p>
-        </div>
-    </footer>
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Livewire Scripts -->
-    @livewireScripts
-</body>
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+            <livewire:layout.navigation />
+
+            <!-- Page Heading -->
+            @if (isset($header))
+                <header class="bg-white dark:bg-gray-800 shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
+    </body>
 </html>

@@ -28,29 +28,4 @@ class Fournisseur extends Model
     {
         return $this->hasMany(MaterielFermierAgricole::class, 'fournisseurId');
     }
-
-    public function modifierInventaire($id, $data)
-    {
-        // Implementation
-    }
-
-    public function supprimerMateriel($id, $soft = true)
-    {
-        // Implementation
-    }
-
-    public function gererStock($id, $quantite)
-    {
-        // Implementation
-    }
-
-    public function genererFacture()
-    {
-        // Implementation
-    }
-
-    public function suivreVente()
-    {
-        // Implementation
-    }
 }

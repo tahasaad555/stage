@@ -9,13 +9,15 @@ class MaterielFermierAgricole extends Model
 {
     use HasFactory;
 
+    protected $table = 'materiels_fermier_agricoles';
+
     protected $fillable = [
-        'id',
         'typeEquipment',
         'estNeuf',
         'description',
         'prix',
         'documentCatalogue',
+        'fournisseurId',
         'annonceId'
     ];
 
@@ -29,7 +31,12 @@ class MaterielFermierAgricole extends Model
     }
 
     public function fournisseur()
-{
-    return $this->belongsTo(Fournisseur::class, 'fournisseurId');
-}
+    {
+        return $this->belongsTo(Fournisseur::class, 'fournisseurId');
+    }
+    
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'materielId');
+    }
 }

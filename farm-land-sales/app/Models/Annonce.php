@@ -5,44 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Annonce extends Model
+class Administrateur extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'id',
-        'titre',
-        'type',
-        'description',
-        'prix',
-        'dateCreation',
-        'estActif',
-        'image',
-        'clientId'
+        'user_id'
     ];
 
-    protected $casts = [
-        'dateCreation' => 'datetime',
-        'estActif' => 'boolean',
-    ];
-
-    public function client()
+    public function user()
     {
-        return $this->belongsTo(Client::class, 'clientId');
-    }
-
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class, 'annonceId');
-    }
-
-    public function terrain()
-    {
-        return $this->hasOne(TerrainAgricole::class, 'annonceId');
-    }
-
-    public function materiel()
-    {
-        return $this->hasOne(MaterielFermierAgricole::class, 'annonceId');
+        return $this->belongsTo(User::class);
     }
 }

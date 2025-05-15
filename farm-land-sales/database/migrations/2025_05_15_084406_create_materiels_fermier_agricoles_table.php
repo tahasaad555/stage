@@ -1,4 +1,3 @@
-// Update database/migrations/2025_05_12_092532_create_materiels_fermier_agricoles_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
