@@ -53,8 +53,28 @@ class LandDetail extends Component
         $user = Auth::user();
         $client = $user->client;
         
-        // Logic to add land to favorites
-        
-        session()->flash('message', 'Added to favorites.');
+        // Check if already in favorites
+        $exists = \App\Models\Favoris::where('client_id', $client->id)
+                        ->where('terrain_id', $this->landId)
+                        ->exists();
+                        
+        if (!$exists) {
+            $favorite = new \App\Models\Favoris();
+            $favorite->client_id = $client->id;
+            $favorite->terrain_id = $this->landId;
+            $favorite->type = 'terrain';
+            $favorite->save();
+            
+            session()->flash('message', 'Added to favorites.');
+        } else {
+            session()->flash('error', 'This land is already in your favorites.');
+        }
+    }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke($id)
+    {
+        $this->mount($id);
+        return $this->render();
     }
 }

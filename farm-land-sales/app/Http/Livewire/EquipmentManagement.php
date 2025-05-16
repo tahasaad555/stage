@@ -30,6 +30,33 @@ class EquipmentManagement extends Component
         'documentCatalogue' => 'nullable|image|max:1024', // Only required for new equipment
     ];
     
+    public function mount($id = null)
+    {
+        if ($id) {
+            $this->equipmentId = $id;
+            $this->isEditing = true;
+            $this->loadEquipment();
+        }
+    }
+    
+    public function loadEquipment()
+    {
+        $equipment = MaterielFermierAgricole::findOrFail($this->equipmentId);
+        
+        // Verify ownership
+        $user = Auth::user();
+        $fournisseurId = $user->fournisseur->id;
+        if ($equipment->fournisseurId != $fournisseurId) {
+            session()->flash('error', 'You do not have permission to edit this equipment.');
+            return redirect()->route('equipment.manage');
+        }
+        
+        $this->typeEquipment = $equipment->typeEquipment;
+        $this->description = $equipment->description;
+        $this->prix = $equipment->prix;
+        $this->estNeuf = $equipment->estNeuf;
+    }
+    
     public function render()
     {
         $fournisseur = Auth::user()->fournisseur;
@@ -57,6 +84,12 @@ class EquipmentManagement extends Component
         
         if ($this->isEditing) {
             $equipment = MaterielFermierAgricole::findOrFail($this->equipmentId);
+            
+            // Verify ownership
+            if ($equipment->fournisseurId != $fournisseur->id) {
+                session()->flash('error', 'You do not have permission to edit this equipment.');
+                return;
+            }
         } else {
             $equipment = new MaterielFermierAgricole();
             $equipment->fournisseurId = $fournisseur->id;
@@ -91,6 +124,14 @@ class EquipmentManagement extends Component
         
         $equipment = MaterielFermierAgricole::findOrFail($id);
         
+        // Verify ownership
+        $user = Auth::user();
+        $fournisseurId = $user->fournisseur->id;
+        if ($equipment->fournisseurId != $fournisseurId) {
+            session()->flash('error', 'You do not have permission to edit this equipment.');
+            return;
+        }
+        
         $this->typeEquipment = $equipment->typeEquipment;
         $this->description = $equipment->description;
         $this->prix = $equipment->prix;
@@ -105,6 +146,14 @@ class EquipmentManagement extends Component
     public function deleteEquipment($id)
     {
         $equipment = MaterielFermierAgricole::findOrFail($id);
+        
+        // Verify ownership
+        $user = Auth::user();
+        $fournisseurId = $user->fournisseur->id;
+        if ($equipment->fournisseurId != $fournisseurId) {
+            session()->flash('error', 'You do not have permission to delete this equipment.');
+            return;
+        }
         
         // Check if there are any pending transactions
         $hasPendingTransactions = $equipment->transactions()->where('statut', '!=', 'Cancelled')->exists();
@@ -122,5 +171,11 @@ class EquipmentManagement extends Component
         $equipment->delete();
         
         session()->flash('message', 'Equipment deleted successfully!');
+    }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
     }
 }

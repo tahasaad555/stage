@@ -65,4 +65,10 @@ class MessagesInbox extends Component
         
         session()->flash('message', 'Reply sent successfully.');
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
+    }
 }

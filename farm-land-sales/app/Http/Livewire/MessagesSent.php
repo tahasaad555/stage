@@ -61,4 +61,10 @@ class MessagesSent extends Component
     {
         $this->resetPage();
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
+    }
 }

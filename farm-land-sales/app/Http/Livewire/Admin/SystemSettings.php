@@ -78,4 +78,10 @@ class SystemSettings extends Component
         
         session()->flash('message', 'Settings saved successfully.');
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
+    }
 }

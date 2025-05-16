@@ -83,4 +83,11 @@ class EquipmentDetail extends Component
             session()->flash('error', 'This item is already in your favorites.');
         }
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke($id)
+    {
+        $this->mount($id);
+        return $this->render();
+    }
 }

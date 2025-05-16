@@ -58,4 +58,10 @@ class LandSearch extends Component
         $this->maxSize = null;
         $this->location = null;
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
+    }
 }

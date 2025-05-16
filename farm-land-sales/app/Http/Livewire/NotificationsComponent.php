@@ -48,4 +48,10 @@ class NotificationsComponent extends Component
         
         session()->flash('message', 'Notification deleted.');
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
+    }
 }

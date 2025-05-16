@@ -78,7 +78,7 @@ class TransactionManagement extends Component
         $this->loadTransactions();
     }
     
-    // Add the __invoke method for route action
+    // This is necessary for using the component directly in a route
     public function __invoke()
     {
         return $this->render();

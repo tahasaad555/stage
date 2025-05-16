@@ -53,4 +53,10 @@ class EquipmentSearch extends Component
         $this->category = null;
         $this->condition = null;
     }
+    
+    // This is necessary for using the component directly in a route
+    public function __invoke()
+    {
+        return $this->render();
+    }
 }
