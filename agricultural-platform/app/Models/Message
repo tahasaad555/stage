@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Message extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'client_id',
+        'fournisseur_id',
+        'contenu',
+        'dateHeure',
+        'lu',
+    ];
+
+    protected $casts = [
+        'dateHeure' => 'datetime',
+        'lu' => 'boolean',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
+    }
+
+    // Methods from class diagram
+    public function envoyer()
+    {
+        $this->dateHeure = now();
+        $this->save();
+    }
+
+    public function marquerCommeVu()
+    {
+        $this->lu = true;
+        $this->save();
+    }
+
+    public function changerContenu($contenu)
+    {
+        $this->contenu = $contenu;
+        $this->save();
+    }
+}

@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class EstimationValeur extends Model
+{
+    use HasFactory;
+
+    protected $table = 'estimation_valeurs';
+    
+    protected $fillable = [
+        'terre_agricole_id',
+        'dateEstimation',
+        'criteres',
+        'valeurEstimee',
+        'calculeDifference',
+    ];
+
+    protected $casts = [
+        'dateEstimation' => 'date',
+        'criteres' => 'array',
+    ];
+
+    public function terreAgricole()
+    {
+        return $this->belongsTo(TerreAgricole::class, 'terre_agricole_id');
+    }
+
+    // Methods from class diagram
+    public function calculerEstimation()
+    {
+        // Implementation logic to calculate the estimated value
+        // based on criteria and market data
+        
+        // For example, a simple calculation:
+        $baseValue = $this->terreAgricole->surface * 1000; // Base value per square meter
+        $locationMultiplier = 1.0;
+        
+        // Apply location factor
+        if (isset($this->criteres['region'])) {
+            switch ($this->criteres['region']) {
+                case 'premium':
+                    $locationMultiplier = 1.5;
+                    break;
+                case 'standard':
+                    $locationMultiplier = 1.2;
+                    break;
+                case 'rural':
+                    $locationMultiplier = 0.8;
+                    break;
+            }
+        }
+        
+        // Final calculation
+        $this->valeurEstimee = $baseValue * $locationMultiplier;
+        $this->save();
+        
+        return $this->valeurEstimee;
+    }
+}

@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Client extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'utilisateur_id',
+        'typeSpecialite',
+        'preferences',
+    ];
+
+    public function utilisateur()
+    {
+        return $this->belongsTo(Utilisateur::class);
+    }
+
+    public function rechercheTerreAgricoles()
+    {
+        return $this->hasMany(Recherche::class);
+    }
+
+    public function favoris()
+    {
+        return $this->hasMany(Favori::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function paniers()
+    {
+        return $this->hasMany(Panier::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function demandeInformations()
+    {
+        return $this->hasMany(DemandeInformation::class);
+    }
+
+    public function avis()
+    {
+        return $this->hasMany(Avis::class);
+    }
+
+    public function situationAgriculteur()
+    {
+        return $this->hasOne(SituationAgriculteur::class);
+    }
+
+    // Client methods from the class diagram
+    public function rechercherTerreAgricole($criteria)
+    {
+        // Implementation
+    }
+
+    public function consulterDetailsProduitsAgricole($id)
+    {
+        // Implementation
+    }
+
+    public function envoyerMessage(Fournisseur $fournisseur, $contenu)
+    {
+        // Implementation
+    }
+
+    public function ajouterFavori(Annonce $annonce)
+    {
+        // Implementation
+    }
+
+    public function subscribe()
+    {
+        // Implementation
+    }
+}

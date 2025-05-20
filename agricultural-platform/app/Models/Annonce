@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Annonce extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'fournisseur_id',
+        'terre_agricole_id',
+        'titre',
+        'description',
+        'dateCreation',
+        'estActive',
+    ];
+
+    protected $casts = [
+        'dateCreation' => 'date',
+        'estActive' => 'boolean',
+    ];
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
+    }
+
+    public function terreAgricole()
+    {
+        return $this->belongsTo(TerreAgricole::class, 'terre_agricole_id');
+    }
+
+    public function historiqueAnnonces()
+    {
+        return $this->hasMany(HistoriqueAnnonce::class);
+    }
+
+    public function favoris()
+    {
+        return $this->hasMany(Favori::class);
+    }
+
+    public function demandeInformations()
+    {
+        return $this->hasMany(DemandeInformation::class);
+    }
+
+    // Methods from class diagram
+    public function publier()
+    {
+        $this->estActive = true;
+        $this->save();
+    }
+
+    public function modifier($data)
+    {
+        $this->update($data);
+        
+        // Create history record
+        $this->historiqueAnnonces()->create([
+            'dateModification' => now(),
+            'modification' => 'Mise à jour',
+            'description' => 'Annonce mise à jour',
+        ]);
+    }
+
+    public function supprimer()
+    {
+        $this->estActive = false;
+        $this->save();
+    }
+}

@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Avis extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'client_id',
+        'fournisseur_id',
+        'note',
+        'commentaire',
+        'dateAvis',
+    ];
+
+    protected $casts = [
+        'dateAvis' => 'date',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
+    }
+
+    // Methods from class diagram
+    public function publier()
+    {
+        // Additional publishing logic if needed
+        $this->dateAvis = now();
+        $this->save();
+    }
+
+    public function modifier($data)
+    {
+        $this->update($data);
+    }
+}

@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Transaction extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'client_id',
+        'fournisseur_id',
+        'dateTransaction',
+        'montant',
+        'commission',
+        'methodePaiement',
+        'statusTransaction',
+        'estVerifiee',
+        'referencePaiement',
+    ];
+
+    protected $casts = [
+        'dateTransaction' => 'date',
+        'estVerifiee' => 'boolean',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
+    }
+
+    public function paiement()
+    {
+        return $this->hasOne(Paiement::class);
+    }
+
+    public function commission()
+    {
+        return $this->hasOne(Commission::class);
+    }
+
+    // Methods from class diagram
+    public function effectuerPaiement()
+    {
+        // Implementation
+    }
+
+    public function annulerTransaction()
+    {
+        $this->statusTransaction = 'annulee';
+        $this->save();
+    }
+
+    public function verifierPaiement()
+    {
+        // Implementation
+    }
+
+    public function genererFacture()
+    {
+        // Implementation
+    }
+
+    public function saveTransaction()
+    {
+        // Implementation
+    }
+}

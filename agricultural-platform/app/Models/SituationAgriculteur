@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class SituationAgriculteur extends Model
+{
+    use HasFactory;
+
+    protected $table = 'situation_agriculteurs';
+    
+    protected $fillable = [
+        'client_id',
+        'statutJuridique',
+        'typeCulture',
+        'tauxEndettement',
+        'recommandationsInvestissement',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    // Method from class diagram
+    public function modifierProfil($data)
+    {
+        $this->update($data);
+    }
+}

@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Commission extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'transaction_id',
+        'taux',
+        'montant',
+        'datePrelevement',
+        'calcule',
+    ];
+
+    protected $casts = [
+        'datePrelevement' => 'date',
+    ];
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
+    }
+
+    // Method to calculate commission amount based on transaction
+    public function calculer()
+    {
+        $this->montant = $this->transaction->montant * ($this->taux / 100);
+        $this->calcule = $this->montant;
+        $this->save();
+        
+        return $this->montant;
+    }
+}

@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Administrateur extends Model
+{
+    use HasFactory;
+
+    protected $table = 'administrateurs';
+    
+    protected $fillable = [
+        'utilisateur_id',
+    ];
+
+    public function utilisateur()
+    {
+        return $this->belongsTo(Utilisateur::class);
+    }
+    
+    // Admin methods for the class diagram
+    public function insererAnnonce()
+    {
+        // Implementation
+    }
+    
+    public function gererUtilisateur()
+    {
+        // Implementation
+    }
+    
+    public function validerTerreAgricole()
+    {
+        // Implementation
+    }
+    
+    public function creerCompte()
+    {
+        // Implementation
+    }
+    
+    public function supprimerCompte()
+    {
+        // Implementation
+    }
+    
+    public function getCommissions()
+    {
+        // Implementation
+    }
+}

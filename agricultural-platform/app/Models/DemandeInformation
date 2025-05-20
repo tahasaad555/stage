@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class DemandeInformation extends Model
+{
+    use HasFactory;
+
+    protected $table = 'demande_informations';
+    
+    protected $fillable = [
+        'client_id',
+        'annonce_id',
+        'sujet',
+        'contenu',
+        'reponseMessage',
+        'repondu',
+    ];
+
+    protected $casts = [
+        'repondu' => 'boolean',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function annonce()
+    {
+        return $this->belongsTo(Annonce::class);
+    }
+
+    // Methods from class diagram
+    public function repondreMessage($reponse)
+    {
+        $this->reponseMessage = $reponse;
+        $this->repondu = true;
+        $this->save();
+    }
+
+    public function isRepondu()
+    {
+        return $this->repondu;
+    }
+}

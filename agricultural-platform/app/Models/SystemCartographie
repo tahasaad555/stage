@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class SystemCartographie extends Model
+{
+    use HasFactory;
+
+    protected $table = 'system_cartographies';
+    
+    protected $fillable = [
+        'terre_agricole_id',
+        'coordonneesGPS',
+        'zoomLevel',
+        'typeMap',
+        'superficie',
+    ];
+
+    public function terreAgricole()
+    {
+        return $this->belongsTo(TerreAgricole::class, 'terre_agricole_id');
+    }
+
+    // Methods from class diagram
+    public function afficherCarte()
+    {
+        // Implementation
+    }
+
+    public function calculerPerimetre()
+    {
+        // Implementation
+    }
+
+    public function verifierTitre()
+    {
+        // Implementation
+    }
+
+    public function calculerSurface()
+    {
+        // Implementation
+    }
+
+    public function getGeoJson()
+    {
+        // Implementation to convert data to GeoJSON format for maps
+    }
+}

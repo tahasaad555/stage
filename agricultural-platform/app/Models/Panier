@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Panier extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'client_id',
+        'dateCreation',
+        'total',
+    ];
+
+    protected $casts = [
+        'dateCreation' => 'datetime',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function ligneCommandes()
+    {
+        return $this->hasMany(LigneCommande::class);
+    }
+
+    // Methods from class diagram
+    public function ajouterProduit($produit, $quantite = 1)
+    {
+        $ligne = $this->ligneCommandes()->create([
+            'produit_id' => $produit->id,
+            'quantite' => $quantite,
+            'prixUnitaire' => $produit->prix,
+        ]);
+        
+        $this->updateTotal();
+        
+        return $ligne;
+    }
+
+    public function supprimerProduit($ligneId)
+    {
+        $this->ligneCommandes()->where('id', $ligneId)->delete();
+        $this->updateTotal();
+    }
+
+    public function validerPanier()
+    {
+        // Implementation
+    }
+
+    protected function updateTotal()
+    {
+        $total = $this->ligneCommandes->sum(function($ligne) {
+            return $ligne->quantite * $ligne->prixUnitaire;
+        });
+        
+        $this->total = $total;
+        $this->save();
+    }
+}

@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class LigneCommande extends Model
+{
+    use HasFactory;
+
+    protected $table = 'ligne_commandes';
+    
+    protected $fillable = [
+        'panier_id',
+        'produit_id',
+        'terre_id',
+        'quantite',
+        'prixUnitaire',
+    ];
+
+    public function panier()
+    {
+        return $this->belongsTo(Panier::class);
+    }
+
+    public function produit()
+    {
+        return $this->belongsTo(ProduitAgricole::class, 'produit_id');
+    }
+
+    public function terre()
+    {
+        return $this->belongsTo(TerreAgricole::class, 'terre_id');
+    }
+    
+    public function getTotal()
+    {
+        return $this->quantite * $this->prixUnitaire;
+    }
+}

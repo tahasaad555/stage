@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ProduitAgricole extends Model
+{
+    use HasFactory;
+
+    protected $table = 'produits_agricoles';
+    
+    protected $fillable = [
+        'nom',
+        'description',
+        'categorie',
+        'prix',
+        'quantite',
+        'marque',
+        'unite',
+        'formule',
+    ];
+
+    public function ligneCommandes()
+    {
+        return $this->hasMany(LigneCommande::class, 'produit_id');
+    }
+
+    // Methods from class diagram
+    public function afficherDetail()
+    {
+        // Implementation
+    }
+
+    public function modifierStock($quantite)
+    {
+        $this->quantite += $quantite;
+        $this->save();
+    }
+
+    public function afficherOutils()
+    {
+        // Implementation
+    }
+
+    public function modifierTarif($prix)
+    {
+        $this->prix = $prix;
+        $this->save();
+    }
+
+    public function verifierParent()
+    {
+        // Implementation
+    }
+}

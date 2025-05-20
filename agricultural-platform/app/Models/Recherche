@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Recherche extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'client_id',
+        'criteres',
+    ];
+
+    protected $casts = [
+        'criteres' => 'array',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    // Methods from class diagram
+    public function rechercherParRegion($region)
+    {
+        // Implementation
+    }
+
+    public function rechercherParPrix($min, $max)
+    {
+        // Implementation
+    }
+
+    public function rechercherParTerrAgricole($criteria)
+    {
+        // Implementation
+    }
+
+    public function rechercherParType($type)
+    {
+        // Implementation
+    }
+}

@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class DocumentFournisseurAgricole extends Model
+{
+    use HasFactory;
+
+    protected $table = 'document_fournisseur_agricoles';
+    
+    protected $fillable = [
+        'fournisseur_id',
+        'typeSol',
+        'estCertifie',
+        'infrastructures',
+        'documentsCadastres',
+    ];
+
+    protected $casts = [
+        'estCertifie' => 'boolean',
+        'documentsCadastres' => 'array',
+    ];
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
+    }
+
+    // Method to handle document uploads
+    public function ajouterDocument($fichier)
+    {
+        $documents = $this->documentsCadastres ?? [];
+        $path = $fichier->store('cadastres', 'public');
+        $documents[] = $path;
+        $this->documentsCadastres = $documents;
+        $this->save();
+        
+        return $path;
+    }
+}

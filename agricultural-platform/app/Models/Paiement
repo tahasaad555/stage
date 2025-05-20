@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Paiement extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'transaction_id',
+        'methode',
+        'details',
+        'status',
+        'valide',
+        'annule',
+    ];
+
+    protected $casts = [
+        'valide' => 'boolean',
+        'annule' => 'boolean',
+    ];
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
+    }
+
+    // Methods from class diagram
+    public function valider()
+    {
+        $this->valide = true;
+        $this->status = 'completed';
+        $this->save();
+        
+        // Update related transaction
+        $this->transaction->estVerifiee = true;
+        $this->transaction->statusTransaction = 'completee';
+        $this->transaction->save();
+    }
+
+    public function annuler()
+    {
+        $this->annule = true;
+        $this->status = 'canceled';
+        $this->save();
+        
+        // Update related transaction
+        $this->transaction->statusTransaction = 'annulee';
+        $this->transaction->save();
+    }
+}

@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class TerreAgricole extends Model
+{
+    use HasFactory;
+
+    protected $table = 'terres_agricoles';
+    
+    protected $fillable = [
+        'titre',
+        'description',
+        'surface',
+        'prix',
+        'region',
+        'pays',
+        'coordonneesGPS',
+        'typeSol',
+        'status',
+        'photos',
+    ];
+
+    // Cast photos JSON string to array
+    protected $casts = [
+        'photos' => 'array',
+    ];
+
+    public function annonce()
+    {
+        return $this->hasOne(Annonce::class, 'terre_agricole_id');
+    }
+
+    public function systemCartographie()
+    {
+        return $this->hasOne(SystemCartographie::class, 'terre_agricole_id');
+    }
+
+    public function estimationValeurs()
+    {
+        return $this->hasMany(EstimationValeur::class, 'terre_agricole_id');
+    }
+
+    public function ligneCommandes()
+    {
+        return $this->hasMany(LigneCommande::class, 'terre_id');
+    }
+
+    // Methods from the class diagram
+    public function afficherDetail()
+    {
+        // Implementation
+    }
+
+    public function calculerEstimation()
+    {
+        // Implementation
+    }
+
+    public function consulterVendeur()
+    {
+        // Implementation
+    }
+}
