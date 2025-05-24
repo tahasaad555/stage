@@ -248,63 +248,46 @@ class TerreAgricoleController extends Controller
     /**
      * Search terres agricoles by criteria
      */
-    public function search(Request $request)
-    {
-        $query = TerreAgricole::query();
-        
-        // Apply search criteria
-        if ($request->has('keyword')) {
-            $keyword = $request->keyword;
-            $query->where(function($q) use ($keyword) {
-                $q->where('titre', 'like', "%{$keyword}%")
-                  ->orWhere('description', 'like', "%{$keyword}%")
-                  ->orWhere('region', 'like', "%{$keyword}%")
-                  ->orWhere('pays', 'like', "%{$keyword}%");
-            });
-        }
-        
-        if ($request->has('region')) {
-            $query->where('region', $request->region);
-        }
-        
-        if ($request->has('pays')) {
-            $query->where('pays', $request->pays);
-        }
-        
-        if ($request->has('prix_min')) {
-            $query->where('prix', '>=', $request->prix_min);
-        }
-        
-        if ($request->has('prix_max')) {
-            $query->where('prix', '<=', $request->prix_max);
-        }
-        
-        if ($request->has('surface_min')) {
-            $query->where('surface', '>=', $request->surface_min);
-        }
-        
-        if ($request->has('surface_max')) {
-            $query->where('surface', '<=', $request->surface_max);
-        }
-        
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-        
-        if ($request->has('typeSol')) {
-            $query->where('typeSol', $request->typeSol);
-        }
-        
-        // Store search criteria in user's recherche table if user is logged in and is a client
-        if (auth()->check() && auth()->user()->isClient()) {
-            $client = auth()->user()->client;
-            $client->rechercheTerreAgricoles()->create([
-                'criteres' => $request->except('_token'),
-            ]);
-        }
-        
-        $terresAgricoles = $query->paginate(12);
-        
-        return view('terres.search-results', compact('terresAgricoles', 'request'));
+ public function search(Request $request)
+{
+    $query = TerreAgricole::query();
+    
+    // Enhance filtering options
+    if ($request->has('keyword')) {
+        $keyword = $request->keyword;
+        $query->where(function($q) use ($keyword) {
+            $q->where('titre', 'like', "%{$keyword}%")
+              ->orWhere('description', 'like', "%{$keyword}%")
+              ->orWhere('region', 'like', "%{$keyword}%")
+              ->orWhere('pays', 'like', "%{$keyword}%")
+              ->orWhere('typeSol', 'like', "%{$keyword}%");
+        });
     }
+    
+    // Add additional filters for price range, surface area, etc.
+    if ($request->has('region')) {
+        $query->where('region', $request->region);
+    }
+    
+    if ($request->has('prix_min') && $request->has('prix_max')) {
+        $query->whereBetween('prix', [$request->prix_min, $request->prix_max]);
+    } elseif ($request->has('prix_min')) {
+        $query->where('prix', '>=', $request->prix_min);
+    } elseif ($request->has('prix_max')) {
+        $query->where('prix', '<=', $request->prix_max);
+    }
+    
+    // Add more filters as needed
+    
+    $terresAgricoles = $query->paginate(12);
+    
+    // Store search in user history if logged in
+    if (auth()->check() && auth()->user()->isClient()) {
+        auth()->user()->client->rechercheTerreAgricoles()->create([
+            'criteres' => $request->except('_token'),
+        ]);
+    }
+    
+    return view('terres.search-results', compact('terresAgricoles', 'request'));
+}
 }

@@ -164,55 +164,85 @@ class TransactionController extends Controller
     /**
      * Process payment for a transaction.
      */
-    public function processPayment(Request $request, Transaction $transaction)
-    {
-        // Ensure the user is the client who created this transaction
-        if (!Auth::user()->isClient() || $transaction->client_id != Auth::user()->client->id) {
-            abort(403, 'Unauthorized action.');
-        }
+   public function processPayment(Request $request, Transaction $transaction)
+{
+    // Ensure the user is the client who created this transaction
+    if (!Auth::user()->isClient() || $transaction->client_id != Auth::user()->client->id) {
+        abort(403, 'Unauthorized action.');
+    }
+    
+    // Check if transaction is already paid
+    if ($transaction->statusTransaction !== 'en_attente') {
+        return redirect()->route('transactions.show', $transaction)
+            ->with('error', 'Cette transaction a déjà été traitée.');
+    }
+    
+    // Mock payment gateway integration
+    // In a real app, you would integrate with a payment gateway like Stripe, PayPal etc.
+    try {
+        // Process payment with gateway
+        $paymentSuccessful = true; // Assume success for now
         
-        // Check if transaction is already paid
-        if ($transaction->statusTransaction !== 'en_attente') {
-            return redirect()->route('transactions.show', $transaction)
-                ->with('error', 'Cette transaction a déjà été traitée.');
-        }
-        
-        // In a real application, you would process the payment with a payment gateway
-        // This is a simplified example
-        
-        // Mock a successful payment
-        $transaction->paiement->update([
-            'status' => 'completee',
-            'valide' => true,
-        ]);
-        
-        $transaction->update([
-            'statusTransaction' => 'completee',
-            'estVerifiee' => true,
-        ]);
-        
-        // Update terre agricole status if it's a land purchase
-        // (This is a simplification - adjust based on your actual data structure)
-        $panier = Panier::where('client_id', $transaction->client_id)
-            ->orderBy('created_at', 'desc')
-            ->first();
+        if ($paymentSuccessful) {
+            // Update payment status
+            $transaction->paiement->update([
+                'status' => 'completee',
+                'valide' => true,
+            ]);
             
-        if ($panier) {
-            foreach ($panier->ligneCommandes as $ligne) {
+            // Update transaction status
+            $transaction->update([
+                'statusTransaction' => 'completee',
+                'estVerifiee' => true,
+            ]);
+            
+            // Update property status if it's a land purchase
+            foreach ($transaction->panier->ligneCommandes as $ligne) {
                 if ($ligne->terre_id) {
                     $ligne->terre->update(['status' => 'vendu']);
                     
-                    // Update the annonce
+                    // Update the related announcement
                     if ($ligne->terre->annonce) {
                         $ligne->terre->annonce->update(['estActive' => false]);
                     }
                 }
             }
+            
+            // Create notification for both client and supplier
+            $this->createTransactionNotifications($transaction);
+            
+            return redirect()->route('transactions.show', $transaction)
+                ->with('success', 'Paiement traité avec succès.');
+        } else {
+            return redirect()->route('transactions.show', $transaction)
+                ->with('error', 'Échec du traitement du paiement. Veuillez réessayer.');
         }
-        
+    } catch (\Exception $e) {
         return redirect()->route('transactions.show', $transaction)
-            ->with('success', 'Paiement traité avec succès.');
+            ->with('error', 'Une erreur est survenue: ' . $e->getMessage());
     }
+}
+
+private function createTransactionNotifications($transaction)
+{
+    // Notify client
+    Notification::create([
+        'utilisateur_id' => $transaction->client->utilisateur->id,
+        'titre' => 'Transaction complétée',
+        'contenu' => "Votre transaction #" . $transaction->id . " a été complétée avec succès.",
+        'lue' => false,
+        'dateCreation' => now(),
+    ]);
+    
+    // Notify supplier
+    Notification::create([
+        'utilisateur_id' => $transaction->fournisseur->utilisateur->id,
+        'titre' => 'Nouvelle vente',
+        'contenu' => "Une transaction #" . $transaction->id . " a été complétée.",
+        'lue' => false,
+        'dateCreation' => now(),
+    ]);
+}
 
     /**
      * Cancel a transaction.

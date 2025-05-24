@@ -86,8 +86,61 @@
         .bg-light-green {
             background-color: rgba(44, 125, 67, 0.1);
         }
+
+        /* Mobile responsiveness improvements */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .table-responsive {
+        width: 100%;
+        margin-bottom: 15px;
+        overflow-y: hidden;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        border: 1px solid #ddd;
+    }
+    
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        left: auto;
+    }
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    h1.h3 {
+        font-size: 1.5rem;
+    }
+    
+    .form-label {
+        margin-bottom: 0.25rem;
+    }
+}
     </style>
+    
     @yield('head')
+    <!-- In layouts/app.blade.php, add in the head section -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">

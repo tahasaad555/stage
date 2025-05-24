@@ -149,3 +149,18 @@ Route::resource('terres', TerreAgricoleController::class)->except(['index', 'sho
 Route::resource('annonces', AnnonceController::class)->except(['index', 'show']);
 Route::resource('transactions', TransactionController::class)->except(['show']);
 Route::get('/create-admin', [App\Http\Controllers\CreateAdminController::class, 'index']);
+
+// Notification routes
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+});
+
+// Report routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/transactions', [ReportController::class, 'generateTransactionReport'])->name('reports.transactions');
+    Route::get('/reports/lands', [ReportController::class, 'generateLandReport'])->name('reports.lands');
+    Route::get('/reports/users', [ReportController::class, 'generateUserReport'])->name('reports.users');
+});

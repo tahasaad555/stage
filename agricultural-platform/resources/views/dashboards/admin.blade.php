@@ -283,4 +283,99 @@
         </div>
     </div>
 </div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Statistiques des Transactions</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="transactionChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Statistiques des Utilisateurs</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="userChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section('scripts')
+<script>
+    // Transaction Chart
+    const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+    const transactionChart = new Chart(transactionCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Complétées', 'En attente', 'Annulées'],
+            datasets: [{
+                label: 'Transactions',
+                data: [
+                    {{ $transactionStats['completees'] }}, 
+                    {{ $transactionStats['enAttente'] }}, 
+                    {{ $transactionStats['annulees'] }}
+                ],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(255, 193, 7, 0.6)',
+                    'rgba(220, 53, 69, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+    
+    // User Chart
+    const userCtx = document.getElementById('userChart').getContext('2d');
+    const userChart = new Chart(userCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Clients', 'Fournisseurs', 'Administrateurs'],
+            datasets: [{
+                data: [
+                    {{ $stats['clients'] }}, 
+                    {{ $stats['fournisseurs'] }}, 
+                    {{ \App\Models\Administrateur::count() }}
+                ],
+                backgroundColor: [
+                    'rgba(0, 123, 255, 0.6)',
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(108, 117, 125, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(0, 123, 255, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(108, 117, 125, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+</script>
 @endsection

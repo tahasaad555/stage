@@ -105,10 +105,30 @@
                     </div>
                 </div>
 
-                @if($terre->systemCartographie && $terre->coordonneesGPS)
-                    <h5 class="mb-3 mt-4">Localisation</h5>
-                    <div id="map" class="mb-3"></div>
-                @endif
+               @if($terre->systemCartographie && $terre->coordonneesGPS)
+    <h5 class="mb-3 mt-4">Localisation</h5>
+    <div id="map" class="mb-3 border rounded" style="height: 400px;"></div>
+    <div class="mb-3">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mapType" id="mapTypeSatellite" value="satellite" checked>
+                    <label class="form-check-label" for="mapTypeSatellite">
+                        Vue satellite
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mapType" id="mapTypeStreet" value="street">
+                    <label class="form-check-label" for="mapTypeStreet">
+                        Vue rue
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
             </div>
         </div>
     </div>
@@ -226,7 +246,7 @@
 @endsection
 
 @section('scripts')
-    @if($terre->systemCartographie && $terre->coordonneesGPS)
+       @if($terre->systemCartographie && $terre->coordonneesGPS)
         <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -239,20 +259,46 @@
                     // Initialize map
                     const map = L.map('map').setView([lat, lng], {{ $terre->systemCartographie->zoomLevel ?? 13 }});
                     
-                    // Add OpenStreetMap tile layer
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    // Default tile layer (satellite)
+                    let satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
                     }).addTo(map);
                     
+                    // Street layer
+                    let streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    });
+                    
                     // Add marker
-                    L.marker([lat, lng]).addTo(map)
+                    const marker = L.marker([lat, lng]).addTo(map)
                         .bindPopup('<strong>{{ $terre->titre }}</strong><br>{{ $terre->surface }} hectares')
                         .openPopup();
                     
-                    // Add area polygon if available
-                    // This would require additional data that's not in your current model
-                }
-            });
-        </script>
-    @endif
+                    // Add area polygon if available (simulated here)
+                    // In a real app, you would get polygon coordinates from the database
+                    const radius = Math.sqrt({{ $terre->surface }} * 10000 / Math.PI); // Rough estimate for circle radius in meters
+                    const circle = L.circle([lat, lng], {
+                        radius: radius,
+                        color: '#2c7d43',
+                        fillColor: '#2c7d43',
+                        fillOpacity: 0.2
+                    }).addTo(map);
+                     // Map type toggle
+                        const mapTypeRadios = document.querySelectorAll('input[name="mapType"]');
+                        mapTypeRadios.forEach(radio => {
+                            radio.addEventListener('change', function() {
+                                if (this.value === 'satellite') {
+                                    map.removeLayer(streetLayer);
+                                    satelliteLayer.addTo(map);
+                                } else if (this.value === 'street') {
+                                    map.removeLayer(satelliteLayer);
+                                    streetLayer.addTo(map);
+                                }
+                            });
+                        });
+                    }
+                });
+            </script>
+        @endif
+                    
 @endsection
