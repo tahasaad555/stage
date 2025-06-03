@@ -45,22 +45,22 @@
                     <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Management</span>
                 </div>
                 
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700">
+                <a href="{{ route('admin.lands.index') }}" 
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700 {{ request()->routeIs('admin.lands.*') ? 'bg-green-50 text-green-700 border-r-2 border-green-500' : '' }}">
                     <i class="fas fa-map mr-3"></i>
                     Agricultural Lands
-                    <span class="ml-auto text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">Soon</span>
                 </a>
                 
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700">
+                <a href="{{ route('admin.listings.index') }}" 
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700 {{ request()->routeIs('admin.listings.*') ? 'bg-green-50 text-green-700 border-r-2 border-green-500' : '' }}">
                     <i class="fas fa-bullhorn mr-3"></i>
                     Listings
-                    <span class="ml-auto text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">Soon</span>
                 </a>
                 
-                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700">
+                <a href="{{ route('admin.transactions.index') }}" 
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-700 {{ request()->routeIs('admin.transactions.*') ? 'bg-green-50 text-green-700 border-r-2 border-green-500' : '' }}">
                     <i class="fas fa-credit-card mr-3"></i>
                     Transactions
-                    <span class="ml-auto text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">Soon</span>
                 </a>
                 
                 <div class="px-4 py-2 mt-4">
