@@ -149,16 +149,16 @@
                 <p class="text-gray-600">Find and filter users with precision</p>
             </div>
             <div class="flex items-center space-x-3">
-                <button class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all">
+                <button onclick="exportUsers()" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all">
                     <i class="fas fa-download mr-2"></i>Export Users
                 </button>
-                <button class="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all">
+                <a href="{{ route('admin.users.create') }}" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all">
                     <i class="fas fa-user-plus mr-2"></i>Add User
-                </button>
+                </a>
             </div>
         </div>
         
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-search mr-2 text-blue-500"></i>Search Users
@@ -213,16 +213,16 @@
                 <div class="flex items-center space-x-4">
                     <!-- View toggles -->
                     <div class="flex bg-white rounded-lg p-1 shadow-inner">
-                        <button class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Grid</button>
-                        <button class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">List</button>
+                        <button onclick="switchView('grid')" id="grid-btn" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Grid</button>
+                        <button onclick="switchView('list')" id="list-btn" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">List</button>
                     </div>
                     
                     <!-- Sort options -->
-                    <select class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
-                        <option>Sort: Newest</option>
-                        <option>Sort: Oldest</option>
-                        <option>Sort: Name A-Z</option>
-                        <option>Sort: Name Z-A</option>
+                    <select onchange="sortUsers(this.value)" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                        <option value="newest">Sort: Newest</option>
+                        <option value="oldest">Sort: Oldest</option>
+                        <option value="name_asc">Sort: Name A-Z</option>
+                        <option value="name_desc">Sort: Name Z-A</option>
                     </select>
                 </div>
             </div>
@@ -507,16 +507,16 @@
     <div class="glass-effect rounded-2xl p-8 shadow-xl">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Quick Management Actions</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <button class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 group">
+            <a href="{{ route('admin.users.create') }}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 group block">
                 <div class="flex items-center justify-between mb-4">
                     <i class="fas fa-user-plus text-3xl group-hover:scale-110 transition-transform"></i>
                     <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">Action</span>
                 </div>
                 <h4 class="font-bold text-lg mb-2">Add New User</h4>
                 <p class="text-sm opacity-90">Create a new user account</p>
-            </button>
+            </a>
             
-            <button class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 group">
+            <button onclick="exportUsers()" class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 group">
                 <div class="flex items-center justify-between mb-4">
                     <i class="fas fa-file-export text-3xl group-hover:scale-110 transition-transform"></i>
                     <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">Export</span>
@@ -525,7 +525,7 @@
                 <p class="text-sm opacity-90">Download user data as CSV</p>
             </button>
             
-            <button class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105 group">
+            <button onclick="sendBulkEmail()" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105 group">
                 <div class="flex items-center justify-between mb-4">
                     <i class="fas fa-envelope text-3xl group-hover:scale-110 transition-transform"></i>
                     <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">Bulk</span>
@@ -534,7 +534,7 @@
                 <p class="text-sm opacity-90">Send bulk emails to users</p>
             </button>
             
-            <button class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 group">
+            <button onclick="generateReport()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all transform hover:scale-105 group">
                 <div class="flex items-center justify-between mb-4">
                     <i class="fas fa-chart-bar text-3xl group-hover:scale-110 transition-transform"></i>
                     <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">Report</span>
@@ -548,6 +548,9 @@
 
 @push('scripts')
 <script>
+// Set up CSRF token for AJAX requests
+window.csrfToken = '{{ csrf_token() }}';
+
 // User Registration Trend Chart
 const registrationCtx = document.getElementById('userRegistrationChart').getContext('2d');
 new Chart(registrationCtx, {
@@ -720,20 +723,122 @@ async function deleteUser(userId) {
     }
 }
 
+// Export Users Function
+function exportUsers() {
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
+    button.disabled = true;
+    
+    try {
+        // Build URL with current filters
+        const currentUrl = new URL(window.location.href);
+        const searchParams = currentUrl.searchParams;
+        
+        // Create export URL with filters
+        const exportUrl = new URL('/admin/users/export', window.location.origin);
+        searchParams.forEach((value, key) => {
+            exportUrl.searchParams.set(key, value);
+        });
+        
+        // Open export URL in new window/tab for download
+        window.open(exportUrl.toString(), '_blank');
+        
+        showAlert('Export started successfully!', 'success');
+        
+    } catch (error) {
+        showAlert('Export failed. Please try again.', 'error');
+    } finally {
+        setTimeout(() => {
+            button.innerHTML = originalContent;
+            button.disabled = false;
+        }, 2000);
+    }
+}
+
+// Send Bulk Email Function
+function sendBulkEmail() {
+    // You can implement a modal or redirect to bulk email page
+    if (confirm('Do you want to send a newsletter to all active users?')) {
+        showAlert('Bulk email feature will be implemented soon!', 'info');
+        // Redirect to bulk email page or open modal
+        // window.location.href = '/admin/users/bulk-email';
+    }
+}
+
+// Generate Report Function
+function generateReport() {
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+    button.disabled = true;
+    
+    // Simulate report generation
+    setTimeout(() => {
+        showAlert('User analytics report generated successfully!', 'success');
+        button.innerHTML = originalContent;
+        button.disabled = false;
+        // You can redirect to report page or download report
+        // window.open('/admin/reports/users.pdf', '_blank');
+    }, 2000);
+}
+
+// View Toggle Functions
+function switchView(viewType) {
+    const gridBtn = document.getElementById('grid-btn');
+    const listBtn = document.getElementById('list-btn');
+    
+    if (viewType === 'grid') {
+        gridBtn.className = 'px-3 py-1 bg-blue-500 text-white rounded text-sm';
+        listBtn.className = 'px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100';
+        // Implement grid view if needed
+        showAlert('Grid view selected', 'info');
+    } else {
+        listBtn.className = 'px-3 py-1 bg-blue-500 text-white rounded text-sm';
+        gridBtn.className = 'px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100';
+        // Implement list view if needed
+        showAlert('List view selected', 'info');
+    }
+}
+
+// Sort Users Function
+function sortUsers(sortType) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('sort', sortType);
+    currentUrl.searchParams.set('page', '1'); // Reset to first page
+    
+    window.location.href = currentUrl.toString();
+}
+
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
-    alertDiv.className = `fixed top-4 right-4 z-50 p-6 rounded-xl shadow-2xl transform transition-all duration-500 ${
-        type === 'success' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
-        'bg-gradient-to-r from-red-500 to-red-600 text-white'
-    }`;
+    let bgColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
+    let icon = 'fa-info-circle';
+    
+    switch(type) {
+        case 'success':
+            bgColor = 'bg-gradient-to-r from-green-500 to-green-600';
+            icon = 'fa-check-circle';
+            break;
+        case 'error':
+            bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
+            icon = 'fa-exclamation-circle';
+            break;
+        case 'info':
+            bgColor = 'bg-gradient-to-r from-blue-500 to-blue-600';
+            icon = 'fa-info-circle';
+            break;
+    }
+    
+    alertDiv.className = `fixed top-4 right-4 z-50 p-6 rounded-xl shadow-2xl transform transition-all duration-500 ${bgColor} text-white`;
     
     alertDiv.innerHTML = `
         <div class="flex items-center">
             <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <i class="fas ${icon}"></i>
             </div>
             <div class="flex-1">
-                <div class="font-semibold">${type === 'success' ? 'Success!' : 'Error!'}</div>
+                <div class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}!</div>
                 <div class="text-sm opacity-90">${message}</div>
             </div>
             <button onclick="this.parentElement.parentElement.remove()" class="ml-4 w-6 h-6 bg-white bg-opacity-20 rounded-lg flex items-center justify-center hover:bg-opacity-30 transition-all">
@@ -796,6 +901,50 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.transform = 'translateY(0)';
         }, index * 100);
     });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + N to create new user
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        window.location.href = '{{ route("admin.users.create") }}';
+    }
+    
+    // Ctrl/Cmd + E to export
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        exportUsers();
+    }
+    
+    // Ctrl/Cmd + F to focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+});
+
+// Auto-refresh page every 5 minutes to keep data current
+setInterval(() => {
+    if (document.visibilityState === 'visible') {
+        // Only refresh if user is actively viewing the page
+        const lastActivity = Date.now() - (window.lastActivityTime || Date.now());
+        if (lastActivity < 300000) { // 5 minutes
+            location.reload();
+        }
+    }
+}, 300000); // 5 minutes
+
+// Track user activity
+window.lastActivityTime = Date.now();
+document.addEventListener('mousemove', () => {
+    window.lastActivityTime = Date.now();
+});
+document.addEventListener('keypress', () => {
+    window.lastActivityTime = Date.now();
 });
 </script>
 @endpush

@@ -258,18 +258,18 @@
             <div class="glass-effect rounded-2xl p-6 shadow-xl">
                 <h4 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h4>
                 <div class="space-y-3">
-                    <button class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-center">
+                    <a href="{{ route('admin.lands.create') }}" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-center">
                         <i class="fas fa-plus mr-2"></i>
                         Add New Land
-                    </button>
-                    <button class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-xl hover:from-green-600 hover:to-green-700 transition-all flex items-center justify-center">
+                    </a>
+                    <a href="{{ route('admin.listings.create') }}" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-xl hover:from-green-600 hover:to-green-700 transition-all flex items-center justify-center">
                         <i class="fas fa-bullhorn mr-2"></i>
                         Create Listing
-                    </button>
-                    <button class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all flex items-center justify-center">
+                    </a>
+                    <a href="{{ route('admin.users.index') }}" class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all flex items-center justify-center">
                         <i class="fas fa-users mr-2"></i>
                         Manage Users
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -300,9 +300,9 @@
                     <h3 class="text-2xl font-bold text-gray-800">Recent Activity</h3>
                     <p class="text-gray-600">Latest platform activities</p>
                 </div>
-                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</button>
+                <a href="#" onclick="refreshActivities()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
             </div>
-            <div class="space-y-4">
+            <div class="space-y-4" id="activityList">
                 <div class="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl">
                     <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                         <i class="fas fa-user-plus text-white text-sm"></i>
@@ -448,7 +448,7 @@
     <div class="glass-effect rounded-2xl p-8 shadow-xl">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Platform Overview</h3>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+            <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl cursor-pointer hover:bg-blue-200 transition-all" onclick="navigateToSection('users')">
                 <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-user-plus text-white"></i>
                 </div>
@@ -457,7 +457,7 @@
                 <p class="text-xs text-blue-500 mt-1">This Month</p>
             </div>
             
-            <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+            <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl cursor-pointer hover:bg-green-200 transition-all" onclick="navigateToSection('transactions')">
                 <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-check-circle text-white"></i>
                 </div>
@@ -466,7 +466,7 @@
                 <p class="text-xs text-green-500 mt-1">Transactions</p>
             </div>
             
-            <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+            <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl cursor-pointer hover:bg-purple-200 transition-all" onclick="navigateToSection('listings')">
                 <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-star text-white"></i>
                 </div>
@@ -475,7 +475,7 @@
                 <p class="text-xs text-purple-500 mt-1">Listings</p>
             </div>
             
-            <div class="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl">
+            <div class="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl cursor-pointer hover:bg-yellow-200 transition-all" onclick="navigateToSection('lands')">
                 <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-map-marker-alt text-white"></i>
                 </div>
@@ -484,7 +484,7 @@
                 <p class="text-xs text-yellow-500 mt-1">Lands</p>
             </div>
             
-            <div class="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl">
+            <div class="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl cursor-pointer hover:bg-red-200 transition-all" onclick="showAdminDetails()">
                 <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-crown text-white"></i>
                 </div>
@@ -493,7 +493,7 @@
                 <p class="text-xs text-red-500 mt-1">Users</p>
             </div>
             
-            <div class="text-center p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl">
+            <div class="text-center p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl cursor-pointer hover:bg-indigo-200 transition-all" onclick="showSuccessRate()">
                 <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-chart-line text-white"></i>
                 </div>
@@ -578,6 +578,74 @@
 .bg-gradient-custom-3 {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
+
+/* Loading animation */
+.loading {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #ccc;
+    border-top: 2px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Button hover effects */
+.btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    padding: 16px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.notification.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
 </style>
 @endpush
 
@@ -613,6 +681,212 @@ function updateTimeAndGreeting() {
 // Call immediately and then every minute
 updateTimeAndGreeting();
 setInterval(updateTimeAndGreeting, 60000);
+
+// Navigation functions
+function navigateToSection(section) {
+    const routes = {
+        'users': '{{ route("admin.users.index") }}',
+        'transactions': '{{ route("admin.transactions.index") }}',
+        'listings': '{{ route("admin.listings.index") }}',
+        'lands': '{{ route("admin.lands.index") }}'
+    };
+    
+    if (routes[section]) {
+        showNotification(`Navigating to ${section.charAt(0).toUpperCase() + section.slice(1)} section...`, 'info');
+        setTimeout(() => {
+            window.location.href = routes[section];
+        }, 1000);
+    }
+}
+
+function showAdminDetails() {
+    showNotification('Displaying administrator information', 'info');
+    
+    // Create and show admin modal
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-crown text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Administrator Users</h3>
+                <p class="text-gray-600 mb-4">Total administrators managing the platform</p>
+                <div class="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-4 mb-6">
+                    <div class="text-3xl font-bold text-red-600 mb-2">{{ $stats['total_admins'] }}</div>
+                    <div class="text-sm text-gray-600">Active Administrator Accounts</div>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="window.location.href='{{ route("admin.users.index", ["role" => "admin"]) }}'" 
+                            class="flex-1 bg-gradient-to-r from-red-500 to-pink-600 text-white py-2 px-4 rounded-lg hover:from-red-600 hover:to-pink-700 transition-all">
+                        View Admins
+                    </button>
+                    <button onclick="this.closest('.fixed').remove()" 
+                            class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Remove modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function showSuccessRate() {
+    showNotification('Platform performance metrics', 'success');
+    
+    // Create success rate modal
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4 transform transition-all">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-chart-line text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Platform Success Rate</h3>
+                <p class="text-gray-600 mb-4">Overall platform performance metrics</p>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Transaction Success Rate</span>
+                            <span class="font-bold text-green-600">94%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full" style="width: 94%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">User Satisfaction</span>
+                            <span class="font-bold text-blue-600">96%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full" style="width: 96%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">System Uptime</span>
+                            <span class="font-bold text-purple-600">99.8%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style="width: 99.8%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="this.closest('.fixed').remove()" 
+                        class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Remove modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function refreshActivities() {
+    const activityList = document.getElementById('activityList');
+    activityList.classList.add('loading');
+    
+    showNotification('Refreshing recent activities...', 'info');
+    
+    // Simulate loading
+    setTimeout(() => {
+        activityList.classList.remove('loading');
+        showNotification('Activities refreshed successfully!', 'success');
+        
+        // Add a new activity to demonstrate refresh
+        const newActivity = document.createElement('div');
+        newActivity.className = 'flex items-center space-x-4 p-4 bg-indigo-50 rounded-xl';
+        newActivity.innerHTML = `
+            <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-refresh text-white text-sm"></i>
+            </div>
+            <div class="flex-1">
+                <p class="font-medium text-gray-800">Activities refreshed</p>
+                <p class="text-sm text-gray-600">Dashboard data updated successfully</p>
+            </div>
+            <span class="text-xs text-gray-500">now</span>
+        `;
+        
+        activityList.insertBefore(newActivity, activityList.firstChild);
+        
+        // Remove the new activity after 5 seconds
+        setTimeout(() => {
+            if (newActivity.parentNode) {
+                newActivity.remove();
+            }
+        }, 5000);
+    }, 2000);
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    const icons = {
+        success: 'fa-check-circle',
+        info: 'fa-info-circle',
+        warning: 'fa-exclamation-triangle',
+        error: 'fa-times-circle'
+    };
+    
+    notification.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas ${icons[type]} mr-3 text-lg"></i>
+                <span>${message}</span>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+    }, 5000);
+}
 
 // Mini charts for cards
 function createMiniChart(canvasId, data, color) {
@@ -850,36 +1124,6 @@ function simulateRealTimeUpdates() {
 // Initialize real-time updates
 simulateRealTimeUpdates();
 
-// Add notification system for new activities
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-        type === 'success' ? 'bg-green-500' : 
-        type === 'warning' ? 'bg-yellow-500' : 
-        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-    } text-white transform translate-x-full transition-transform duration-300`;
-    
-    notification.innerHTML = `
-        <div class="flex items-center space-x-2">
-            <i class="fas fa-${type === 'success' ? 'check' : type === 'warning' ? 'exclamation' : type === 'error' ? 'times' : 'info'}-circle"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    setTimeout(() => {
-        notification.style.transform = 'translateX(full)';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
 // Simulate periodic notifications
 setInterval(() => {
     const messages = [
@@ -895,6 +1139,68 @@ setInterval(() => {
         showNotification(messages[randomIndex], types[randomIndex]);
     }
 }, 60000);
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Alt + U for users
+    if (e.altKey && e.key === 'u') {
+        e.preventDefault();
+        navigateToSection('users');
+    }
+    
+    // Alt + T for transactions
+    if (e.altKey && e.key === 't') {
+        e.preventDefault();
+        navigateToSection('transactions');
+    }
+    
+    // Alt + L for listings
+    if (e.altKey && e.key === 'l') {
+        e.preventDefault();
+        navigateToSection('listings');
+    }
+    
+    // Alt + A for lands (Agricultural lands)
+    if (e.altKey && e.key === 'a') {
+        e.preventDefault();
+        navigateToSection('lands');
+    }
+});
+
+// Add hover effects to cards
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to quick action buttons
+    const quickActionButtons = document.querySelectorAll('.glass-effect a, .glass-effect button');
+    quickActionButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+    
+    // Add click feedback to statistic cards
+    const statCards = document.querySelectorAll('[onclick]');
+    statCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    });
+});
+
+// Welcome message on page load
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        showNotification('Welcome to your AgriTerre dashboard!', 'success');
+    }, 1000);
+});
 </script>
 @endpush
 
