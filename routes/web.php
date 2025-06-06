@@ -39,7 +39,7 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::get('/users/export', [UserController::class, 'export'])->name('users.export'); // Added export route
+    Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
@@ -67,9 +67,19 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
     Route::post('/listings/{listing}/toggle-featured', [ListingController::class, 'toggleFeatured'])->name('listings.toggle-featured');
     Route::delete('/listings/{listing}', [ListingController::class, 'destroy'])->name('listings.destroy');
     
-    // Transactions
+    // Transactions - Complete Management with Export and Bulk Operations
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    
+    // Export and Bulk Operations
+    Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
+    Route::post('/transactions/generate-report', [TransactionController::class, 'generateReport'])->name('transactions.generate-report');
+    Route::post('/transactions/bulk-update', [TransactionController::class, 'bulkUpdate'])->name('transactions.bulk-update');
+    Route::post('/transactions/reconcile', [TransactionController::class, 'reconcile'])->name('transactions.reconcile');
+    
+    // Individual Transaction Operations (NEW ROUTES ADDED HERE)
     Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::post('/transactions/{transaction}/send-notification', [TransactionController::class, 'sendNotification'])->name('transactions.send-notification');
+    Route::get('/transactions/{transaction}/export-pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export-pdf');
     Route::post('/transactions/{transaction}/update-status', [TransactionController::class, 'updateStatus'])->name('transactions.update-status');
     Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
 });
