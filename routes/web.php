@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AgriculturalLandController;
 use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Middleware\AdminMiddleware;
 
 /*
@@ -76,10 +77,41 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
     Route::post('/transactions/bulk-update', [TransactionController::class, 'bulkUpdate'])->name('transactions.bulk-update');
     Route::post('/transactions/reconcile', [TransactionController::class, 'reconcile'])->name('transactions.reconcile');
     
-    // Individual Transaction Operations (NEW ROUTES ADDED HERE)
+    // Individual Transaction Operations
     Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
     Route::post('/transactions/{transaction}/send-notification', [TransactionController::class, 'sendNotification'])->name('transactions.send-notification');
     Route::get('/transactions/{transaction}/export-pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export-pdf');
     Route::post('/transactions/{transaction}/update-status', [TransactionController::class, 'updateStatus'])->name('transactions.update-status');
     Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+    // Settings Routes - Updated and Comprehensive
+    Route::prefix('settings')->name('settings.')->group(function () {
+        // Main settings page
+        Route::get('/', [SettingsController::class, 'index'])->name('index');
+        
+        // Settings update routes (for different sections)
+        Route::post('/general', [SettingsController::class, 'updateGeneral'])->name('general');
+        Route::post('/commission', [SettingsController::class, 'updateCommission'])->name('commission');
+        Route::post('/email', [SettingsController::class, 'updateEmail'])->name('email');
+        Route::post('/security', [SettingsController::class, 'updateSecurity'])->name('security');
+        Route::post('/backup', [SettingsController::class, 'updateBackup'])->name('backup');
+        
+        // System maintenance and utilities
+        Route::post('/cache/clear', [SettingsController::class, 'clearCache'])->name('cache.clear');
+        Route::post('/backup/run', [SettingsController::class, 'runBackup'])->name('backup.run');
+        Route::post('/optimize-system', [SettingsController::class, 'optimizeSystem'])->name('optimize-system');
+        Route::post('/maintenance/enable', [SettingsController::class, 'enableMaintenance'])->name('maintenance.enable');
+        Route::post('/maintenance/disable', [SettingsController::class, 'disableMaintenance'])->name('maintenance.disable');
+        Route::get('/system-info', [SettingsController::class, 'getSystemInfo'])->name('system-info');
+        
+        // Additional utility routes
+        Route::post('/test-email', [SettingsController::class, 'testEmail'])->name('test-email');
+        Route::post('/backup-database', [SettingsController::class, 'backupDatabase'])->name('backup-database');
+        Route::post('/optimize-database', [SettingsController::class, 'optimizeDatabase'])->name('optimize-database');
+        Route::post('/rebuild-cache', [SettingsController::class, 'rebuildCache'])->name('rebuild-cache');
+        
+        // Import/Export settings
+        Route::post('/export', [SettingsController::class, 'exportSettings'])->name('export');
+        Route::post('/import', [SettingsController::class, 'importSettings'])->name('import');
+    });
 });
