@@ -888,193 +888,297 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// Mini charts for cards
-function createMiniChart(canvasId, data, color) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['', '', '', '', '', ''],
-            datasets: [{
-                data: data,
-                borderColor: 'white',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                fill: true,
-                tension: 0.4,
-                pointRadius: 0,
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { display: false }
+// Wait for DOM to load before initializing charts
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Mini charts for cards - improved error handling
+    function createMiniChart(canvasId, data, color) {
+        try {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.warn(`Canvas element with ID '${canvasId}' not found`);
+                return;
             }
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['', '', '', '', '', ''],
+                    datasets: [{
+                        data: data,
+                        borderColor: 'rgba(255,255,255,0.8)',
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (error) {
+            console.error(`Error creating mini chart for ${canvasId}:`, error);
         }
+    }
+
+    // Create mini charts with delay to ensure DOM is ready
+    setTimeout(() => {
+        createMiniChart('usersChart', [12, 19, 15, 25, 22, 30], '#3B82F6');
+        createMiniChart('landsChart', [8, 12, 18, 15, 20, 25], '#10B981');
+        createMiniChart('listingsChart', [15, 25, 20, 30, 28, 35], '#8B5CF6');
+        createMiniChart('revenueChart', [20, 35, 30, 45, 40, 50], '#F59E0B');
+    }, 500);
+
+    // Enhanced User Growth Chart
+    function createUserGrowthChart() {
+        try {
+            const canvas = document.getElementById('userGrowthChart');
+            if (!canvas) {
+                console.warn('User Growth Chart canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode(isset($userGrowthData) ? array_column($userGrowthData, 'month') : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']) !!},
+                    datasets: [{
+                        label: 'New Users',
+                        data: {!! json_encode(isset($userGrowthData) ? array_column($userGrowthData, 'count') : [12, 19, 25, 32, 28, 45]) !!},
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#3B82F6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }, {
+                        label: 'Active Users',
+                        data: [15, 25, 18, 32, 28, 45],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#10B981',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#3B82F6',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            border: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6B7280'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            border: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6B7280'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating User Growth Chart:', error);
+        }
+    }
+
+    // Enhanced Revenue Chart
+    function createRevenueChart() {
+        try {
+            const canvas = document.getElementById('revenueAreaChart');
+            if (!canvas) {
+                console.warn('Revenue Area Chart canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {!! json_encode(isset($revenueData) ? array_column($revenueData, 'month') : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']) !!},
+                    datasets: [{
+                        label: 'Revenue',
+                        data: {!! json_encode(isset($revenueData) ? array_column($revenueData, 'revenue') : [8000, 12000, 15000, 18000, 22000, 25000]) !!},
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#10B981',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }, {
+                        label: 'Commission',
+                        data: {!! json_encode(isset($revenueData) ? array_column($revenueData, 'commission') : [800, 1200, 1500, 1800, 2200, 2500]) !!},
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#F59E0B',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#10B981',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': 
+                 + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            border: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6B7280'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            border: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6B7280',
+                                callback: function(value) {
+                                    return '
+                 + (value / 1000) + 'k';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating Revenue Chart:', error);
+        }
+    }
+
+    // Initialize main charts with delay
+    setTimeout(() => {
+        createUserGrowthChart();
+        createRevenueChart();
+    }, 1000);
+
+    // Add hover effects to quick action buttons
+    const quickActionButtons = document.querySelectorAll('.glass-effect a, .glass-effect button');
+    quickActionButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
     });
-}
-
-// Create mini charts
-createMiniChart('usersChart', [12, 19, 15, 25, 22, 30], '#3B82F6');
-createMiniChart('landsChart', [8, 12, 18, 15, 20, 25], '#10B981');
-createMiniChart('listingsChart', [15, 25, 20, 30, 28, 35], '#8B5CF6');
-createMiniChart('revenueChart', [20, 35, 30, 45, 40, 50], '#F59E0B');
-
-// Enhanced User Growth Chart
-const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
-new Chart(userGrowthCtx, {
-    type: 'line',
-    data: {
-        labels: {!! json_encode(isset($userGrowthData) ? array_column($userGrowthData, 'month') : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']) !!},
-        datasets: [{
-            label: 'New Users',
-            data: {!! json_encode(isset($userGrowthData) ? array_column($userGrowthData, 'count') : [12, 19, 25, 32, 28, 45]) !!},
-            borderColor: '#3B82F6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            tension: 0.4,
-            fill: true,
-            pointBackgroundColor: '#3B82F6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6
-        }, {
-            label: 'Active Users',
-            data: [15, 25, 18, 32, 28, 45],
-            borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            tension: 0.4,
-            fill: true,
-            pointBackgroundColor: '#10B981',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            intersect: false,
-            mode: 'index'
-        },
-        plugins: {
-            legend: {
-                display: false
-            },
-            tooltip: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                titleColor: '#ffffff',
-                bodyColor: '#ffffff',
-                borderColor: '#3B82F6',
-                borderWidth: 1,
-                cornerRadius: 8
-            }
-        },
-        scales: {
-            x: {
-                grid: {
-                    display: false
-                },
-                border: {
-                    display: false
-                }
-            },
-            y: {
-                beginAtZero: true,
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.05)'
-                },
-                border: {
-                    display: false
-                }
-            }
-        }
-    }
-});
-
-// Enhanced Revenue Chart
-const revenueAreaCtx = document.getElementById('revenueAreaChart').getContext('2d');
-new Chart(revenueAreaCtx, {
-    type: 'line',
-    data: {
-        labels: {!! json_encode(isset($revenueData) ? array_column($revenueData, 'month') : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']) !!},
-        datasets: [{
-            label: 'Revenue',
-            data: {!! json_encode(isset($revenueData) ? array_column($revenueData, 'revenue') : [8000, 12000, 15000, 18000, 22000, 25000]) !!},
-            borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#10B981',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6
-        }, {
-            label: 'Commission',
-            data: {!! json_encode(isset($revenueData) ? array_column($revenueData, 'commission') : [800, 1200, 1500, 1800, 2200, 2500]) !!},
-            borderColor: '#F59E0B',
-            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#F59E0B',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            intersect: false,
-            mode: 'index'
-        },
-        plugins: {
-            legend: {
-                display: false
-            },
-            tooltip: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                titleColor: '#ffffff',
-                bodyColor: '#ffffff',
-                borderColor: '#10B981',
-                borderWidth: 1,
-                cornerRadius: 8,
-                callbacks: {
-                    label: function(context) {
-                        return context.dataset.label + ':  + context.parsed.y.toLocaleString();
-                    }
-                }
-            }
-        },
-        scales: {
-            x: {
-                grid: {
-                    display: false
-                },
-                border: {
-                    display: false
-                }
-            },
-            y: {
-                beginAtZero: true,
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.05)'
-                },
-                border: {
-                    display: false
-                },
-                ticks: {
-                    callback: function(value) {
-                        return ' + (value / 1000) + 'k';
-                    }
-                }
-            }
-        }
-    }
+    
+    // Add click feedback to statistic cards
+    const statCards = document.querySelectorAll('[onclick]');
+    statCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    });
 });
 
 // Add smooth scrolling for internal links
@@ -1111,12 +1215,14 @@ window.addEventListener('load', function() {
 // Add real-time updates simulation
 function simulateRealTimeUpdates() {
     const revenueElement = document.querySelector('.text-3xl.font-bold');
-    if (revenueElement && revenueElement.textContent.includes(')) {
+    if (revenueElement && revenueElement.textContent.includes('
+                )) {
         // Simulate small incremental updates
         setInterval(() => {
             const currentValue = parseFloat(revenueElement.textContent.replace(/[$,]/g, ''));
             const newValue = currentValue + Math.floor(Math.random() * 10);
-            revenueElement.textContent = ' + newValue.toLocaleString();
+            revenueElement.textContent = '
+                 + newValue.toLocaleString();
         }, 30000); // Update every 30 seconds
     }
 }
@@ -1165,34 +1271,6 @@ document.addEventListener('keydown', function(e) {
         e.preventDefault();
         navigateToSection('lands');
     }
-});
-
-// Add hover effects to cards
-document.addEventListener('DOMContentLoaded', function() {
-    // Add hover effects to quick action buttons
-    const quickActionButtons = document.querySelectorAll('.glass-effect a, .glass-effect button');
-    quickActionButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-            this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
-        });
-        
-        button.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '';
-        });
-    });
-    
-    // Add click feedback to statistic cards
-    const statCards = document.querySelectorAll('[onclick]');
-    statCards.forEach(card => {
-        card.addEventListener('click', function() {
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 150);
-        });
-    });
 });
 
 // Welcome message on page load

@@ -82,4 +82,15 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
     Route::get('/transactions/{transaction}/export-pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export-pdf');
     Route::post('/transactions/{transaction}/update-status', [TransactionController::class, 'updateStatus'])->name('transactions.update-status');
     Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+     Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\NotificationController::class, 'index'])
+            ->name('index');
+        Route::post('/mark-read/{id?}', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])
+            ->name('mark-read');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])
+            ->name('destroy');
+        Route::get('/stats', [App\Http\Controllers\Admin\NotificationController::class, 'getStats'])
+            ->name('stats');
+    });
 });
