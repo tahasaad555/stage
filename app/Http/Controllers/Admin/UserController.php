@@ -38,15 +38,15 @@ class UserController extends Controller
 
         $users = $query->latest()->paginate(15);
 
-        // Statistics
-        $stats = [
-            'total' => User::count(),
-            'active' => User::active()->count(),
-            'inactive' => User::where('is_active', false)->count(),
-            'clients' => User::byRole('client')->count(),
-            'fournisseurs' => User::byRole('fournisseur')->count(),
-            'admins' => User::byRole('admin')->count(),
-        ];
+       // Statistics
+$stats = [
+    'total' => User::count(),
+    'active' => User::where('is_active', true)->count(),
+    'inactive' => User::where('is_active', false)->count(),
+    'clients' => User::where('role', 'client')->count(),
+    'fournisseurs' => User::where('role', 'fournisseur')->count(),
+    'admins' => User::where('role', 'admin')->count(),
+];
 
         return view('admin.users.index', compact('users', 'stats'));
     }
