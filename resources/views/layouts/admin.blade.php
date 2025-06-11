@@ -424,6 +424,47 @@
                 this.style.transform = 'translateY(0) scale(1)';
             });
         });
+
+        // FIX LOGOUT BUTTON LOADING ISSUE
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutForms = document.querySelectorAll('form[action*="logout"]');
+            
+            logoutForms.forEach(form => {
+                let isSubmitting = false;
+                
+                form.addEventListener('submit', function(e) {
+                    if (isSubmitting) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    isSubmitting = true;
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        const originalContent = submitBtn.innerHTML;
+                        
+                        // Check if it's sidebar logout or dropdown logout
+                        if (submitBtn.parentElement.parentElement.classList.contains('absolute')) {
+                            // Sidebar logout button
+                            submitBtn.innerHTML = '<div class="w-8 h-8 bg-red-500 bg-opacity-80 rounded-lg flex items-center justify-center mr-3"><i class="fas fa-spinner fa-spin text-sm"></i></div><span class="font-medium">Logging out...</span>';
+                        } else {
+                            // Dropdown logout button
+                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>Logging out...';
+                        }
+                        
+                        setTimeout(() => {
+                            if (submitBtn.disabled) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalContent;
+                                isSubmitting = false;
+                            }
+                        }, 10000);
+                    }
+                });
+            });
+        });
     </script>
     
     @stack('scripts')

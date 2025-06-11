@@ -51,7 +51,7 @@
         <div class="absolute top-1/2 left-10 w-16 h-16 bg-blue-400 opacity-15 rounded-full floating-animation" style="animation-delay: -4s;"></div>
     </div>
 
-    <div class="relative w-full max-w-2xl">
+    <div class="relative w-full max-w-3xl">
         <!-- Main Registration Card -->
         <div class="glass-effect rounded-3xl shadow-2xl p-8 backdrop-blur-xl">
             <!-- Header -->
@@ -64,16 +64,11 @@
             </div>
 
             <!-- Error Messages -->
-            @if($errors->any())
-                <div class="mb-6 bg-red-500 bg-opacity-20 border border-red-400 border-opacity-30 text-red-100 px-4 py-3 rounded-xl">
-                    <h4 class="font-semibold mb-2">Please fix the following errors:</h4>
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach($errors->all() as $error)
-                            <li class="text-sm">{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <div id="errorMessages" class="mb-6 bg-red-500 bg-opacity-20 border border-red-400 border-opacity-30 text-red-100 px-4 py-3 rounded-xl hidden">
+                <h4 class="font-semibold mb-2">Please fix the following errors:</h4>
+                <ul class="list-disc list-inside space-y-1" id="errorList">
+                </ul>
+            </div>
 
             <!-- Registration Form -->
             <form action="{{ route('register') }}" method="POST" class="space-y-6" id="registerForm">
@@ -175,10 +170,53 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Security -->
+                <!-- Step 3: Business Information (Suppliers Only) -->
                 <div class="step-section hidden" id="step3">
                     <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
                         <span class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-black font-bold mr-3">3</span>
+                        <span id="step3Title">Business Information</span>
+                    </h3>
+                    
+                    <!-- Business fields for suppliers -->
+                    <div id="businessFields" class="space-y-4">
+                        <!-- Company Name -->
+                        <div>
+                            <label for="company_name" class="block text-sm font-medium text-white text-opacity-90 mb-2">
+                                <i class="fas fa-building mr-2"></i>Company Name
+                            </label>
+                            <input type="text" id="company_name" name="company_name"
+                                   value="{{ old('company_name') }}"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-xl text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
+                                   placeholder="Enter your company name">
+                        </div>
+                        
+                        <!-- Business Registration Number -->
+                        <div>
+                            <label for="business_registration" class="block text-sm font-medium text-white text-opacity-90 mb-2">
+                                <i class="fas fa-certificate mr-2"></i>Business Registration Number
+                            </label>
+                            <input type="text" id="business_registration" name="business_registration"
+                                   value="{{ old('business_registration') }}"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-xl text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
+                                   placeholder="Enter your business registration number">
+                        </div>
+                        
+                        <!-- Business Address -->
+                        <div>
+                            <label for="address" class="block text-sm font-medium text-white text-opacity-90 mb-2">
+                                <i class="fas fa-map-marker-alt mr-2"></i>Business Address
+                            </label>
+                            <textarea id="address" name="address" rows="3"
+                                      class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-xl text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all resize-none"
+                                      placeholder="Enter your complete business address">{{ old('address') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Security -->
+                <div class="step-section hidden" id="step4">
+                    <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-black font-bold mr-3">4</span>
                         Security Setup
                     </h3>
                     
@@ -248,10 +286,11 @@
                         <i class="fas fa-arrow-left mr-2"></i>Previous
                     </button>
                     
-                    <div class="flex space-x-2">
+                    <div class="flex space-x-2" id="stepIndicators">
                         <div class="w-3 h-3 rounded-full bg-green-400" id="step-indicator-1"></div>
                         <div class="w-3 h-3 rounded-full bg-white bg-opacity-30" id="step-indicator-2"></div>
                         <div class="w-3 h-3 rounded-full bg-white bg-opacity-30" id="step-indicator-3"></div>
+                        <div class="w-3 h-3 rounded-full bg-white bg-opacity-30" id="step-indicator-4"></div>
                     </div>
                     
                     <button type="button" id="nextBtn" class="px-6 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold rounded-xl hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
@@ -290,7 +329,8 @@
 
     <script>
         let currentStep = 1;
-        const totalSteps = 3;
+        let totalSteps = 3; // Will be updated based on role
+        let selectedRole = '';
 
         // Role selection
         document.querySelectorAll('.role-card').forEach(card => {
@@ -301,31 +341,81 @@
                 // Add selected class to clicked card
                 this.classList.add('selected');
                 
-                // Update hidden input
-                document.getElementById('role').value = this.dataset.role;
+                // Update selected role and hidden input
+                selectedRole = this.dataset.role;
+                document.getElementById('role').value = selectedRole;
+                
+                // Update step configuration based on role
+                updateStepConfiguration();
                 
                 // Enable next button
                 document.getElementById('nextBtn').disabled = false;
             });
         });
 
+        function updateStepConfiguration() {
+            if (selectedRole === 'supplier') {
+                totalSteps = 4;
+                // Make business fields required
+                document.getElementById('company_name').required = true;
+                document.getElementById('business_registration').required = true;
+                document.getElementById('address').required = true;
+                
+                // Update step 3 title
+                document.getElementById('step3Title').textContent = 'Business Information';
+            } else {
+                totalSteps = 3;
+                // Remove business fields requirement
+                document.getElementById('company_name').required = false;
+                document.getElementById('business_registration').required = false;
+                document.getElementById('address').required = false;
+                
+                // Update step 3 title for clients (skip business info)
+                document.getElementById('step3Title').textContent = 'Security Setup';
+            }
+            
+            // Update step indicators
+            updateStepIndicators();
+        }
+
+        function updateStepIndicators() {
+            const indicatorsContainer = document.getElementById('stepIndicators');
+            indicatorsContainer.innerHTML = '';
+            
+            for (let i = 1; i <= totalSteps; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = i === 1 ? 'w-3 h-3 rounded-full bg-green-400' : 'w-3 h-3 rounded-full bg-white bg-opacity-30';
+                indicator.id = `step-indicator-${i}`;
+                indicatorsContainer.appendChild(indicator);
+            }
+        }
+
         // Step navigation
         function showStep(step) {
             // Hide all steps
             document.querySelectorAll('.step-section').forEach(s => s.classList.add('hidden'));
             
+            // Determine which step to show based on role
+            let stepToShow = step;
+            if (selectedRole === 'client' && step >= 3) {
+                // For clients, skip business info step
+                stepToShow = step === 3 ? 4 : step;
+            }
+            
             // Show current step
-            document.getElementById(`step${step}`).classList.remove('hidden');
+            document.getElementById(`step${stepToShow}`).classList.remove('hidden');
             
             // Update indicators
             for (let i = 1; i <= totalSteps; i++) {
                 const indicator = document.getElementById(`step-indicator-${i}`);
-                if (i <= step) {
-                    indicator.classList.remove('bg-white', 'bg-opacity-30');
-                    indicator.classList.add('bg-green-400');
-                } else {
-                    indicator.classList.remove('bg-green-400');
-                    indicator.classList.add('bg-white', 'bg-opacity-30');
+                if (indicator) {
+                    if (i <= step) {
+                        indicator.classList.remove('bg-white', 'bg-opacity-30');
+                        indicator.classList.add('bg-green-400');
+                    } else {
+                        indicator.classList.remove('bg-green-400');
+                        indicator.classList.add('bg-white', 'bg-opacity-30');
+                    }
                 }
             }
             
@@ -365,28 +455,61 @@
 
         // Validation for each step
         function validateCurrentStep() {
+            const errors = [];
+            
             if (currentStep === 1) {
-                const role = document.getElementById('role').value;
-                if (!role) {
-                    alert('Please select your role before continuing.');
-                    return false;
+                if (!selectedRole) {
+                    errors.push('Please select your role before continuing.');
                 }
             } else if (currentStep === 2) {
-                const firstName = document.getElementById('first_name').value;
-                const lastName = document.getElementById('last_name').value;
-                const email = document.getElementById('email').value;
+                const firstName = document.getElementById('first_name').value.trim();
+                const lastName = document.getElementById('last_name').value.trim();
+                const email = document.getElementById('email').value.trim();
                 
-                if (!firstName || !lastName || !email) {
-                    alert('Please fill in all required fields.');
-                    return false;
-                }
+                if (!firstName) errors.push('First name is required.');
+                if (!lastName) errors.push('Last name is required.');
+                if (!email) errors.push('Email address is required.');
+                else if (!isValidEmail(email)) errors.push('Please enter a valid email address.');
                 
-                if (!isValidEmail(email)) {
-                    alert('Please enter a valid email address.');
-                    return false;
-                }
+            } else if (currentStep === 3 && selectedRole === 'supplier') {
+                const companyName = document.getElementById('company_name').value.trim();
+                const businessReg = document.getElementById('business_registration').value.trim();
+                const businessAddress = document.getElementById('address').value.trim();
+                
+                if (!companyName) errors.push('Company name is required for suppliers.');
+                if (!businessReg) errors.push('Business registration number is required for suppliers.');
+                if (!businessAddress) errors.push('Business address is required for suppliers.');
             }
-            return true;
+            
+            if (errors.length > 0) {
+                showErrors(errors);
+                return false;
+            } else {
+                hideErrors();
+                return true;
+            }
+        }
+
+        function showErrors(errors) {
+            const errorContainer = document.getElementById('errorMessages');
+            const errorList = document.getElementById('errorList');
+            
+            errorList.innerHTML = '';
+            errors.forEach(error => {
+                const li = document.createElement('li');
+                li.textContent = error;
+                li.className = 'text-sm';
+                errorList.appendChild(li);
+            });
+            
+            errorContainer.classList.remove('hidden');
+            
+            // Scroll to top to show errors
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideErrors() {
+            document.getElementById('errorMessages').classList.add('hidden');
         }
 
         // Email validation
@@ -432,24 +555,14 @@
 
         function checkPasswordStrength(password) {
             let score = 0;
-            let feedback = [];
             
             if (password.length >= 8) score += 1;
-            else feedback.push('At least 8 characters');
-            
             if (/[a-z]/.test(password)) score += 1;
-            else feedback.push('Lowercase letter');
-            
             if (/[A-Z]/.test(password)) score += 1;
-            else feedback.push('Uppercase letter');
-            
             if (/[0-9]/.test(password)) score += 1;
-            else feedback.push('Number');
-            
             if (/[^A-Za-z0-9]/.test(password)) score += 1;
-            else feedback.push('Special character');
             
-            return { score, feedback };
+            return { score };
         }
 
         function updatePasswordStrength(strength) {
@@ -478,7 +591,43 @@
         }
 
         // Form submission
-        document.getElementById('registerForm').addEventListener('submit', function() {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            // Final validation before submission
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('password_confirmation').value;
+            const terms = document.getElementById('terms').checked;
+            const errors = [];
+
+            if (password !== confirmPassword) {
+                errors.push('Passwords do not match.');
+            }
+            
+            if (password.length < 8) {
+                errors.push('Password must be at least 8 characters long.');
+            }
+            
+            if (!terms) {
+                errors.push('You must agree to the Terms of Service and Privacy Policy.');
+            }
+
+            // Validate supplier fields if supplier is selected
+            if (selectedRole === 'supplier') {
+                const companyName = document.getElementById('company_name').value.trim();
+                const businessReg = document.getElementById('business_registration').value.trim();
+                const businessAddress = document.getElementById('address').value.trim();
+                
+                if (!companyName) errors.push('Company name is required for suppliers.');
+                if (!businessReg) errors.push('Business registration number is required for suppliers.');
+                if (!businessAddress) errors.push('Business address is required for suppliers.');
+            }
+
+            if (errors.length > 0) {
+                e.preventDefault();
+                showErrors(errors);
+                return false;
+            }
+
+            // Show loading state
             const button = document.getElementById('submitBtn');
             button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Account...';
             button.disabled = true;

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Supplier\SupplierDashboardController;
+use App\Http\Controllers\Supplier\PropertyController; // Add this line
 use App\Http\Middleware\AdminMiddleware;
 
 /*
@@ -168,10 +169,17 @@ Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(functi
     Route::get('/profile', [SupplierDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [SupplierDashboardController::class, 'updateProfile'])->name('profile.update');
     
-    // Add more supplier routes here as needed
-    // Route::resource('properties', SupplierPropertyController::class);
-    // Route::get('/inquiries', [SupplierInquiryController::class, 'index'])->name('inquiries.index');
-    // Route::patch('/inquiries/{inquiry}/respond', [SupplierInquiryController::class, 'respond'])->name('inquiries.respond');
+    // Properties Routes
+    Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
+    Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+    Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])->name('properties.destroy');
+    Route::post('/properties/{property}/toggle-status', [PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
+    Route::post('/properties/{property}/toggle-featured', [PropertyController::class, 'toggleFeatured'])->name('properties.toggle-featured');
+    
+    // Dashboard API endpoints
+    Route::get('/api/dashboard-summary', [SupplierDashboardController::class, 'getDashboardSummary'])->name('api.dashboard-summary');
+    Route::get('/api/quick-stats', [SupplierDashboardController::class, 'getQuickStats'])->name('api.quick-stats');
 });
 
 // Legacy fournisseur routes for backward compatibility
