@@ -49,4 +49,19 @@ class TerreAgricole extends Model
     {
         return $query->where('status', 'available');
     }
+        /**
+     * Get all annonces (listings) for this land
+     */
+    public function annonces()
+    {
+        return $this->hasMany(Annonce::class, 'terre_agricole_id');
+    }
+
+    /**
+     * Alternative relationship name for clarity
+     */
+    public function listings()
+    {
+        return $this->hasMany(Annonce::class, 'terre_agricole_id');
+    }
 }

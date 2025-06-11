@@ -12,6 +12,7 @@ class ListingController extends Controller
 {
     public function index(Request $request)
     {
+        // ✅ FIXED: Load the complete relationship chain
         $query = Annonce::with(['fournisseur.user', 'terreAgricole']);
 
         // Search functionality
@@ -19,14 +20,22 @@ class ListingController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('titre', 'like', "%{$search}%") // Search both title fields
                   ->orWhere('description', 'like', "%{$search}%")
                   ->orWhereHas('terreAgricole', function($landQuery) use ($search) {
                       $landQuery->where('title', 'like', "%{$search}%")
                                ->orWhere('region', 'like', "%{$search}%");
                   })
+                  // ✅ FIXED: Search through the complete relationship chain
                   ->orWhereHas('fournisseur.user', function($userQuery) use ($search) {
                       $userQuery->where('first_name', 'like', "%{$search}%")
-                               ->orWhere('last_name', 'like', "%{$search}%");
+                               ->orWhere('last_name', 'like', "%{$search}%")
+                               ->orWhere('email', 'like', "%{$search}%");
+                  })
+                  // ✅ ALSO search in fournisseur fields if they exist
+                  ->orWhereHas('fournisseur', function($fournisseurQuery) use ($search) {
+                      $fournisseurQuery->where('company_name', 'like', "%{$search}%")
+                                      ->orWhere('business_registration', 'like', "%{$search}%");
                   });
             });
         }
@@ -61,7 +70,7 @@ class ListingController extends Controller
             'published' => Annonce::whereNotNull('published_at')->count(),
         ];
 
-        // Get suppliers for filter
+        // ✅ FIXED: Load fournisseurs with their user relationships
         $fournisseurs = Fournisseur::with('user')->get();
 
         return view('admin.listings.index', compact('listings', 'stats', 'fournisseurs'));
@@ -69,6 +78,7 @@ class ListingController extends Controller
 
     public function show(Annonce $listing)
     {
+        // ✅ FIXED: Load the complete relationship chain
         $listing->load(['fournisseur.user', 'terreAgricole']);
         
         return view('admin.listings.show', compact('listing'));
@@ -79,6 +89,7 @@ class ListingController extends Controller
         $lands = TerreAgricole::where('status', 'available')
                              ->whereDoesntHave('annonce')
                              ->get();
+        // ✅ FIXED: Load fournisseurs with their user relationships
         $fournisseurs = Fournisseur::with('user')->get();
         
         return view('admin.listings.create', compact('lands', 'fournisseurs'));
@@ -105,6 +116,9 @@ class ListingController extends Controller
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
         
+        // ✅ ADDED: Store in both title fields for compatibility
+        $validated['titre'] = $validated['title'];
+        
         if ($request->filled('published_at')) {
             $validated['published_at'] = $request->published_at;
         } elseif ($validated['is_active']) {
@@ -125,6 +139,7 @@ class ListingController extends Controller
                                        ->orWhere('id', $listing->terre_agricole_id);
                              })
                              ->get();
+        // ✅ FIXED: Load fournisseurs with their user relationships
         $fournisseurs = Fournisseur::with('user')->get();
         
         return view('admin.listings.edit', compact('listing', 'lands', 'fournisseurs'));
@@ -152,6 +167,9 @@ class ListingController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
+        
+        // ✅ ADDED: Store in both title fields for compatibility
+        $validated['titre'] = $validated['title'];
         
         if ($request->filled('published_at')) {
             $validated['published_at'] = $request->published_at;

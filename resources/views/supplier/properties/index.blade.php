@@ -107,26 +107,44 @@
 @section('content')
 <div class="space-y-8">
     <!-- Enhanced Header -->
-    <div class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-700 rounded-2xl p-8 text-white shadow-2xl">
-        <div class="flex items-center justify-between">
-            <div class="flex-1">
-                <div class="flex items-center mb-4">
-                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mr-6">
-                        <i class="fas fa-seedling text-3xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-4xl font-bold mb-2">🌾 My Properties</h1>
-                        <p class="text-xl opacity-90">Manage your agricultural property listings</p>
-                    </div>
+   <!-- Enhanced Header -->
+<div class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-700 rounded-2xl p-8 text-white shadow-2xl">
+    <div class="flex items-center justify-between">
+        <div class="flex-1">
+            <div class="flex items-center mb-4">
+                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mr-6">
+                    <i class="fas fa-seedling text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">🌾 My Properties</h1>
+                    <p class="text-xl opacity-90">Manage your agricultural property listings</p>
                 </div>
             </div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <!-- Portfolio Stats -->
             <div class="text-right">
                 <div class="text-lg opacity-75">Total Portfolio</div>
                 <div class="text-3xl font-bold">${{ number_format($stats['total_value'] / 1000000, 1) }}M</div>
                 <div class="text-sm opacity-75">{{ number_format($stats['total_surface'], 1) }} hectares</div>
             </div>
+            
+            <!-- Add Property Button -->
+            <div class="hidden lg:block">
+                <a href="{{ route('supplier.properties.create') }}" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-xl transition-all font-medium shadow-lg border border-white border-opacity-30">
+                    <i class="fas fa-plus mr-2"></i>Add New Property
+                </a>
+            </div>
         </div>
     </div>
+    
+    <!-- Mobile Add Button -->
+    <div class="lg:hidden mt-4">
+        <a href="{{ route('supplier.properties.create') }}" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-xl transition-all font-medium shadow-lg border border-white border-opacity-30 inline-block text-center">
+            <i class="fas fa-plus mr-2"></i>Add New Property
+        </a>
+    </div>
+</div>
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -260,9 +278,9 @@
                 @endif
             </p>
             @if(!request()->hasAny(['search', 'status', 'featured']))
-                <button class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-lg">
-                    <i class="fas fa-plus mr-3"></i>Add Your First Property
-                </button>
+               <a href="{{ route('supplier.properties.create') }}" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-lg inline-block">
+    <i class="fas fa-plus mr-3"></i>Add Your First Property
+</a>
             @else
                 <a href="{{ route('supplier.properties.index') }}" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-4 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all font-medium text-lg">
                     <i class="fas fa-times mr-3"></i>Clear Filters
@@ -317,22 +335,30 @@
                             <p class="text-gray-600 text-sm line-clamp-3">{{ $property->description }}</p>
                         </div>
                         
-                        @if($property->terreAgricole)
-                            <div class="grid grid-cols-2 gap-4 mb-6">
-                                <div class="text-center p-3 bg-white bg-opacity-50 rounded-lg">
-                                    <div class="text-2xl font-bold text-green-600">{{ number_format($property->terreAgricole->surface, 1) }}</div>
-                                    <div class="text-xs text-gray-600">Hectares</div>
-                                </div>
-                                <div class="text-center p-3 bg-white bg-opacity-50 rounded-lg">
-                                    <div class="text-2xl font-bold text-blue-600">${{ number_format($property->terreAgricole->price / 1000) }}K</div>
-                                    <div class="text-xs text-gray-600">Price</div>
-                                </div>
-                                <div class="col-span-2 text-center p-3 bg-white bg-opacity-50 rounded-lg">
-                                    <div class="font-semibold text-gray-800">{{ $property->terreAgricole->region }}</div>
-                                    <div class="text-xs text-gray-600">Region</div>
-                                </div>
-                            </div>
-                        @endif
+                       @if($property->terreAgricole)
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="text-center p-3 bg-white bg-opacity-50 rounded-lg">
+            <div class="text-2xl font-bold text-green-600">{{ number_format($property->terreAgricole->surface, 1) }}</div>
+            <div class="text-xs text-gray-600">Hectares</div>
+        </div>
+        <div class="text-center p-3 bg-white bg-opacity-50 rounded-lg">
+            @if($property->prix)
+                <div class="text-xl font-bold text-blue-600">{{ number_format($property->prix / 1000) }}K MAD</div>
+                <div class="text-xs text-gray-600">Your Price</div>
+                @if($property->prix != $property->terreAgricole->price)
+                    <div class="text-xs text-gray-400 line-through">{{ number_format($property->terreAgricole->price / 1000) }}K Base</div>
+                @endif
+            @else
+                <div class="text-xl font-bold text-gray-500">{{ number_format($property->terreAgricole->price / 1000) }}K MAD</div>
+                <div class="text-xs text-gray-600">Base Price</div>
+            @endif
+        </div>
+        <div class="col-span-2 text-center p-3 bg-white bg-opacity-50 rounded-lg">
+            <div class="font-semibold text-gray-800">{{ $property->terreAgricole->region }}</div>
+            <div class="text-xs text-gray-600">Region</div>
+        </div>
+    </div>
+@endif
                         
                         <div class="flex space-x-2">
                             <a href="{{ route('supplier.properties.show', $property) }}" 

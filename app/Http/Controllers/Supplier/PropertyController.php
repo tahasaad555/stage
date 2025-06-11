@@ -44,6 +44,7 @@ class PropertyController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('titre', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%")
                   ->orWhereHas('terreAgricole', function($landQuery) use ($search) {
                       $landQuery->where('title', 'like', "%{$search}%")
@@ -82,6 +83,86 @@ class PropertyController extends Controller
         return view('supplier.properties.index', compact('properties', 'stats'));
     }
 
+/**
+ * Show the form for creating a new property.
+ */
+public function create()
+{
+    $user = auth()->user();
+    $fournisseur = $user->fournisseur;
+    
+    if (!$fournisseur) {
+        return redirect()->route('supplier.dashboard')
+            ->with('error', 'Supplier profile not found.');
+    }
+
+    // ✅ SIMPLE & SECURE: Only show lands specifically assigned to this supplier
+    $agriculturalLands = TerreAgricole::where('status', 'available')
+        ->where('assigned_supplier_id', $fournisseur->id) // Only their assigned lands
+        ->get();
+    
+    return view('supplier.properties.create', compact('agriculturalLands'));
+}
+
+    /**
+     * Store a newly created property in storage.
+     */
+    public function store(Request $request)
+    {
+        $user = auth()->user();
+        $fournisseur = $user->fournisseur;
+        
+        if (!$fournisseur) {
+            return redirect()->route('supplier.dashboard')
+                ->with('error', 'Supplier profile not found.');
+        }
+
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'required|string|min:50',
+            'terre_agricole_id' => 'required|exists:terres_agricoles,id',
+            'prix' => 'required|numeric|min:0',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean'
+        ]);
+
+        // Verify the land exists and is available
+        $land = TerreAgricole::where('id', $validated['terre_agricole_id'])
+            ->where('status', 'available')
+            ->firstOrFail();
+
+        // Check if this land is already listed by this supplier
+        $existingListing = Annonce::where('terre_agricole_id', $validated['terre_agricole_id'])
+            ->where('fournisseur_id', $fournisseur->id)
+            ->first();
+
+        if ($existingListing) {
+            return back()->withErrors(['terre_agricole_id' => 'You already have a listing for this land.']);
+        }
+
+        // Create the property listing using Annonce model
+        $property = Annonce::create([
+            'titre' => $validated['titre'],
+            'title' => $validated['titre'],
+            'description' => $validated['description'],
+            'terre_agricole_id' => $validated['terre_agricole_id'],
+            'prix' => $validated['prix'],
+            'fournisseur_id' => $fournisseur->id,
+            'is_active' => $request->boolean('is_active', false),
+            'is_featured' => $request->boolean('is_featured', false),
+        ]);
+
+        // Set published_at if property is active
+        if ($property->is_active) {
+            $property->published_at = now();
+            $property->save();
+        }
+
+        return redirect()
+            ->route('supplier.properties.index')
+            ->with('success', 'Property listing created successfully!');
+    }
+
     /**
      * Show specific property details
      */
@@ -93,9 +174,41 @@ class PropertyController extends Controller
             abort(403, 'Unauthorized access to this property.');
         }
 
-        $property->load(['terreAgricole', 'fournisseur.user']);
+       $property->load(['terreAgricole', 'fournisseur']);
         
         return view('supplier.properties.show', compact('property'));
+    }
+
+    /**
+     * Update property listing
+     */
+    public function update(Request $request, Annonce $property)
+    {
+        // Ensure the property belongs to the authenticated supplier
+        $user = auth()->user();
+        if ($property->fournisseur_id !== $user->fournisseur->id) {
+            abort(403, 'Unauthorized access to this property.');
+        }
+
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'required|string',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+        $validated['is_featured'] = $request->has('is_featured');
+        $validated['title'] = $validated['titre'];
+        
+        // Set published_at when activating for the first time
+        if ($validated['is_active'] && !$property->published_at) {
+            $validated['published_at'] = now();
+        }
+
+        $property->update($validated);
+
+        return back()->with('success', 'Property updated successfully!');
     }
 
     /**
@@ -144,37 +257,6 @@ class PropertyController extends Controller
             'featured' => $property->is_featured,
             'message' => $property->is_featured ? 'Property featured successfully' : 'Property unfeatured successfully'
         ]);
-    }
-
-    /**
-     * Update property listing
-     */
-    public function update(Request $request, Annonce $property)
-    {
-        // Ensure the property belongs to the authenticated supplier
-        $user = auth()->user();
-        if ($property->fournisseur_id !== $user->fournisseur->id) {
-            abort(403, 'Unauthorized access to this property.');
-        }
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'is_active' => 'boolean',
-            'is_featured' => 'boolean',
-        ]);
-
-        $validated['is_active'] = $request->has('is_active');
-        $validated['is_featured'] = $request->has('is_featured');
-        
-        // Set published_at when activating for the first time
-        if ($validated['is_active'] && !$property->published_at) {
-            $validated['published_at'] = now();
-        }
-
-        $property->update($validated);
-
-        return back()->with('success', 'Property updated successfully!');
     }
 
     /**

@@ -203,13 +203,13 @@
                     @endif
                 </a>
                 
-                <a href="#" 
-                   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
-                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-plus text-sm"></i>
-                    </div>
-                    <span class="font-medium">Add Property</span>
-                </a>
+                <a href="{{ route('supplier.properties.create') }}" 
+   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group {{ request()->routeIs('supplier.properties.create') ? 'bg-white bg-opacity-20' : '' }}">
+    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
+        <i class="fas fa-plus text-sm"></i>
+    </div>
+    <span class="font-medium">Add Property</span>
+</a>
                 
                 <a href="#" 
                    class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">

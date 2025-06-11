@@ -231,14 +231,14 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-user-tie mr-2 text-yellow-500"></i>Supplier
                 </label>
-                <select name="fournisseur" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all">
-                    <option value="">All Suppliers</option>
-                    @foreach($fournisseurs as $fournisseur)
-                        <option value="{{ $fournisseur->id }}" {{ request('fournisseur') == $fournisseur->id ? 'selected' : '' }}>
-                            🏢 {{ $fournisseur->user->full_name }}
-                        </option>
-                    @endforeach
-                </select>
+               <select name="fournisseur" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all">
+    <option value="">All Suppliers</option>
+    @foreach($fournisseurs as $fournisseur)
+        <option value="{{ $fournisseur->id }}" {{ request('fournisseur') == $fournisseur->id ? 'selected' : '' }}>
+            🏢 {{ $fournisseur->user->first_name ?? 'Unknown' }} {{ $fournisseur->user->last_name ?? 'User' }}
+        </option>
+    @endforeach
+</select>
             </div>
 
             <div>
@@ -426,28 +426,34 @@
                             </td>
                             
                             <!-- Supplier Info -->
-                            <td class="px-4 py-4">
-                                @if($listing->fournisseur && $listing->fournisseur->user)
-                                    <div class="flex items-center space-x-2">
-                                        <div class="flex-shrink-0">
-                                            <div class="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
-                                                <span class="text-white font-bold text-xs">
-                                                    {{ substr($listing->fournisseur->user->first_name, 0, 1) }}{{ substr($listing->fournisseur->user->last_name, 0, 1) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <div class="text-sm font-medium text-gray-900 truncate">{{ $listing->fournisseur->user->full_name }}</div>
-                                            <div class="text-xs text-gray-500 truncate">{{ $listing->fournisseur->company_name ?: 'Individual' }}</div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="flex items-center text-red-500">
-                                        <i class="fas fa-user-times mr-2"></i>
-                                        <span class="text-sm">No supplier</span>
-                                    </div>
-                                @endif
-                            </td>
+                            <!-- Supplier Info -->
+<td class="px-4 py-4">
+    @if($listing->fournisseur && $listing->fournisseur->user)
+        <div class="flex items-center space-x-2">
+            <div class="flex-shrink-0">
+                <div class="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                    <span class="text-white font-bold text-xs">
+                        {{ substr($listing->fournisseur->user->first_name ?? 'U', 0, 1) }}{{ substr($listing->fournisseur->user->last_name ?? 'U', 0, 1) }}
+                    </span>
+                </div>
+            </div>
+            <div class="min-w-0 flex-1">
+                <div class="text-sm font-medium text-gray-900 truncate">
+                    {{ $listing->fournisseur->user->first_name }} {{ $listing->fournisseur->user->last_name }}
+                </div>
+                <div class="text-xs text-gray-500 truncate">{{ $listing->fournisseur->user->email }}</div>
+                @if($listing->fournisseur->company_name)
+                    <div class="text-xs text-gray-400 truncate">{{ $listing->fournisseur->company_name }}</div>
+                @endif
+            </div>
+        </div>
+    @else
+        <div class="flex items-center text-red-500">
+            <i class="fas fa-user-times mr-2"></i>
+            <span class="text-sm">No supplier</span>
+        </div>
+    @endif
+</td>
                             
                             <!-- Status & Features -->
                             <td class="px-4 py-4">

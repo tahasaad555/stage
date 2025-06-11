@@ -235,9 +235,9 @@
                         </div>
                         <h3 class="text-2xl font-bold text-gray-600 mb-3">No Properties Yet</h3>
                         <p class="text-gray-500 mb-8 max-w-md mx-auto">Start building your agricultural business by adding your first property listing</p>
-                        <button class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-lg">
-                            <i class="fas fa-plus mr-3"></i>Add Your First Property
-                        </button>
+                       <a href="{{ route('supplier.properties.create') }}" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium text-lg inline-block text-center">
+    <i class="fas fa-plus mr-3"></i>Add Your First Property
+</a>
                     </div>
                 @else
                     <div class="space-y-4">
@@ -294,12 +294,14 @@
                         @endforeach
                         
                         @if($stats['total_properties'] > 3)
-                            <div class="text-center pt-4">
-                                <a href="{{ route('supplier.properties.index') }}" 
-                                   class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium">
-                                    <i class="fas fa-seedling mr-2"></i>View All Properties ({{ $stats['total_properties'] }})
-                                </a>
-                            </div>
+                           <div class="flex space-x-3">
+    <a href="{{ route('supplier.properties.index') }}" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all font-medium">
+        View All Properties
+    </a>
+    <a href="{{ route('supplier.properties.create') }}" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all font-medium">
+        <i class="fas fa-plus mr-2"></i>Add Property
+    </a>
+</div>
                         @endif
                     </div>
                 @endif

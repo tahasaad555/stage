@@ -33,4 +33,5 @@ class Fournisseur extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+    
 }
