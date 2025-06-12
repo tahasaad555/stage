@@ -23,56 +23,56 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+ public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        // Find user by email
-        $user = User::where('email', $request->email)->first();
+    // Find user by email
+    $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
-            return back()->withErrors([
-                'email' => 'No account found with this email address.',
-            ])->withInput();
-        }
-
-        // Check if user is active
-        if (!$user->is_active) {
-            return back()->withErrors([
-                'email' => 'This account has been deactivated.',
-            ])->withInput();
-        }
-
-        // Check password
-        if (!Hash::check($request->password, $user->password)) {
-            return back()->withErrors([
-                'password' => 'The password is incorrect.',
-            ])->withInput();
-        }
-
-        // Login the user
-        Auth::login($user, $request->filled('remember'));
-
-        // Update last login
-        $user->update(['last_login_at' => now()]);
-
-        $request->session()->regenerate();
-
-        // Redirect based on role - be very specific about the redirect
-        if ($user->isAdmin()) {
-            return redirect('/admin/dashboard');
-        } elseif ($user->isClient()) {
-            return redirect('/client/dashboard');
-        } elseif ($user->isFournisseur()) {
-            return redirect('/fournisseur/dashboard');
-        }
-
-        // Fallback redirect
-        return redirect('/');
+    if (!$user) {
+        return back()->withErrors([
+            'email' => 'No account found with this email address.',
+        ])->withInput();
     }
+
+    // Check if user is active
+    if (!$user->is_active) {
+        return back()->withErrors([
+            'email' => 'This account has been deactivated.',
+        ])->withInput();
+    }
+
+    // Check password
+    if (!Hash::check($request->password, $user->password)) {
+        return back()->withErrors([
+            'password' => 'The password is incorrect.',
+        ])->withInput();
+    }
+
+    // Login the user
+    Auth::login($user, $request->filled('remember'));
+
+    // Update last login
+    $user->update(['last_login_at' => now()]);
+
+    $request->session()->regenerate();
+
+    // ✅ FIXED: Correct redirect URLs
+    if ($user->isAdmin()) {
+        return redirect('/admin/dashboard');
+    } elseif ($user->isClient()) {
+        return redirect('/client/dashboard');
+    } elseif ($user->isFournisseur()) {
+        return redirect('/supplier/dashboard'); // ✅ FIXED: Was /fournisseur/dashboard
+    }
+
+    // Fallback redirect
+    return redirect('/');
+}
 
     public function logout(Request $request)
     {

@@ -9,7 +9,6 @@ class TerreAgricole extends Model
 {
     use HasFactory;
 
-    // Explicitly specify the table name
     protected $table = 'terres_agricoles';
 
     protected $fillable = [
@@ -19,10 +18,12 @@ class TerreAgricole extends Model
         'price',
         'region',
         'country',
+        'localisation',
         'gps_coordinates',
         'soil_type',
         'status',
         'photos',
+        'assigned_supplier_id', // ✅ Add this
     ];
 
     protected function casts(): array
@@ -32,6 +33,12 @@ class TerreAgricole extends Model
             'surface' => 'decimal:2',
             'price' => 'decimal:2',
         ];
+    }
+
+    // ✅ Add this relationship
+    public function assignedSupplier()
+    {
+        return $this->belongsTo(Fournisseur::class, 'assigned_supplier_id');
     }
 
     public function annonce()
@@ -44,24 +51,25 @@ class TerreAgricole extends Model
         return $this->hasMany(Transaction::class);
     }
 
-    // Scopes
-    public function scopeAvailable($query)
-    {
-        return $query->where('status', 'available');
-    }
-        /**
-     * Get all annonces (listings) for this land
-     */
     public function annonces()
     {
         return $this->hasMany(Annonce::class, 'terre_agricole_id');
     }
 
-    /**
-     * Alternative relationship name for clarity
-     */
     public function listings()
     {
         return $this->hasMany(Annonce::class, 'terre_agricole_id');
+    }
+
+    // Scopes
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'available');
+    }
+
+    // ✅ Add this scope
+    public function scopeAssignedTo($query, $supplierId)
+    {
+        return $query->where('assigned_supplier_id', $supplierId);
     }
 }

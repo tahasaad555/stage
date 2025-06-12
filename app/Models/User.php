@@ -61,7 +61,7 @@ class User extends Authenticatable
         return $this->role === 'fournisseur';
     }
 
-    // Relationships
+    // Core Relationships
     public function client()
     {
         return $this->hasOne(Client::class);
@@ -70,6 +70,28 @@ class User extends Authenticatable
     public function fournisseur()
     {
         return $this->hasOne(Fournisseur::class);
+    }
+
+    // ✅ FIXED: Property relationships through Fournisseur model
+    public function properties()
+    {
+        return $this->hasManyThrough(Annonce::class, Fournisseur::class, 'user_id', 'fournisseur_id');
+    }
+
+    public function activeProperties()
+    {
+        return $this->properties()->where('is_active', true);
+    }
+
+    public function featuredProperties()
+    {
+        return $this->properties()->where('is_featured', true);
+    }
+
+    // Alternative French names for clarity
+    public function annonces()
+    {
+        return $this->hasManyThrough(Annonce::class, Fournisseur::class, 'user_id', 'fournisseur_id');
     }
 
     // Scopes
@@ -82,35 +104,4 @@ class User extends Authenticatable
     {
         return $query->where('role', $role);
     }
-    
-    /**
- * Get all properties (annonces) for the user.
- */
-public function properties()
-{
-    return $this->hasMany(Annonce::class, 'fournisseur_id');
-}
-
-/**
- * Get active properties for the user.
- */
-public function activeProperties()
-{
-    return $this->properties()->where('is_active', true);
-}
-
-/**
- * Get featured properties for the user.
- */
-public function featuredProperties()
-{
-    return $this->properties()->where('is_featured', true);
-}
-
-// Alternative French names for clarity
-public function annonces()
-{
-    return $this->hasMany(Annonce::class, 'fournisseur_id');
-}
-
 }

@@ -3,7 +3,7 @@
 @section('title', 'Listings Management')
 
 @section('content')
-<div class="space-y-8">
+<div class="space-y-6">
     <!-- Enhanced Header -->
     <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-700 rounded-2xl p-8 text-white shadow-2xl">
         <div class="flex items-center justify-between">

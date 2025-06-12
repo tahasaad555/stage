@@ -3,19 +3,18 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up()
     {
         Schema::table('annonces', function (Blueprint $table) {
-            // Make sure the column is exactly the right type
+            // Ensure columns are correct type
             $table->unsignedBigInteger('fournisseur_id')->nullable()->change();
             $table->unsignedBigInteger('terre_agricole_id')->nullable()->change();
         });
-        
-        // Add foreign keys separately
+
+        // Add foreign keys in separate statement
         Schema::table('annonces', function (Blueprint $table) {
             $table->foreign('fournisseur_id')->references('id')->on('fournisseurs')->onDelete('set null');
             $table->foreign('terre_agricole_id')->references('id')->on('terres_agricoles')->onDelete('cascade');

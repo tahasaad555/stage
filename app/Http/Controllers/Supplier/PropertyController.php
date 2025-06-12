@@ -83,26 +83,26 @@ class PropertyController extends Controller
         return view('supplier.properties.index', compact('properties', 'stats'));
     }
 
-/**
- * Show the form for creating a new property.
- */
-public function create()
-{
-    $user = auth()->user();
-    $fournisseur = $user->fournisseur;
-    
-    if (!$fournisseur) {
-        return redirect()->route('supplier.dashboard')
-            ->with('error', 'Supplier profile not found.');
-    }
+    /**
+     * Show the form for creating a new property.
+     */
+    public function create()
+    {
+        $user = auth()->user();
+        $fournisseur = $user->fournisseur;
+        
+        if (!$fournisseur) {
+            return redirect()->route('supplier.dashboard')
+                ->with('error', 'Supplier profile not found.');
+        }
 
-    // ✅ SIMPLE & SECURE: Only show lands specifically assigned to this supplier
-    $agriculturalLands = TerreAgricole::where('status', 'available')
-        ->where('assigned_supplier_id', $fournisseur->id) // Only their assigned lands
-        ->get();
-    
-    return view('supplier.properties.create', compact('agriculturalLands'));
-}
+        // ✅ FIXED: Allow multiple listings per land (sale, rent, different terms)
+        // Show all lands assigned to this supplier
+        $agriculturalLands = TerreAgricole::where('assigned_supplier_id', $fournisseur->id)
+            ->get();
+        
+        return view('supplier.properties.create', compact('agriculturalLands'));
+    }
 
     /**
      * Store a newly created property in storage.
@@ -126,18 +126,20 @@ public function create()
             'is_featured' => 'boolean'
         ]);
 
-        // Verify the land exists and is available
+        // ✅ IMPROVED: Verify the land is assigned to this supplier
         $land = TerreAgricole::where('id', $validated['terre_agricole_id'])
-            ->where('status', 'available')
+            ->where('assigned_supplier_id', $fournisseur->id)
             ->firstOrFail();
 
-        // Check if this land is already listed by this supplier
-        $existingListing = Annonce::where('terre_agricole_id', $validated['terre_agricole_id'])
+        // ✅ Allow multiple listings but warn about similar ones
+        $existingListings = Annonce::where('terre_agricole_id', $validated['terre_agricole_id'])
             ->where('fournisseur_id', $fournisseur->id)
-            ->first();
+            ->where('is_active', true)
+            ->get();
 
-        if ($existingListing) {
-            return back()->withErrors(['terre_agricole_id' => 'You already have a listing for this land.']);
+        if ($existingListings->count() > 0) {
+            // Add a warning message but allow the creation
+            session()->flash('warning', 'You already have ' . $existingListings->count() . ' active listing(s) for this land.');
         }
 
         // Create the property listing using Annonce model
