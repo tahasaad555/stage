@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Supplier;
 use App\Http\Controllers\Controller;
 use App\Models\Annonce;
 use App\Models\Fournisseur;
+use App\Models\Inquiry;
 use Illuminate\Http\Request;
 
 class SupplierDashboardController extends Controller
@@ -23,7 +24,20 @@ class SupplierDashboardController extends Controller
             'total_properties' => 0,
             'active_properties' => 0,
             'total_inquiries' => 0,
+            'new' => 0,
             'monthly_views' => 0,
+        ];
+        
+        $inquiryStats = [
+            'total' => 0,
+            'new' => 0,
+            'read' => 0,
+            'responded' => 0,
+            'closed' => 0,
+            'this_month' => 0,
+            'this_week' => 0,
+            'high_priority' => 0,
+            'urgent' => 0,
         ];
         
         // If user has supplier profile, get real data
@@ -42,8 +56,12 @@ class SupplierDashboardController extends Controller
                 'total_properties' => $allProperties->count(),
                 'active_properties' => $allProperties->where('is_active', true)->count(),
                 'total_inquiries' => $this->getInquiriesCount($fournisseur),
+                'new' => $this->getNewInquiriesCount($fournisseur),
                 'monthly_views' => $this->getMonthlyViews($fournisseur),
             ];
+            
+            // Get detailed inquiry statistics
+            $inquiryStats = $this->getInquiryStats($fournisseur);
         }
         
         // Get recent notifications (placeholder for now)
@@ -52,9 +70,10 @@ class SupplierDashboardController extends Controller
         $data = [
             'user' => $user,
             'properties' => $properties,
-            'inquiries' => collect(), // Will be populated when inquiry system is built
+            'inquiries' => collect(),
             'notifications' => $notifications,
-            'stats' => $stats
+            'stats' => $stats,
+            'inquiryStats' => $inquiryStats,
         ];
 
         return view('supplier.dashboard', $data);
@@ -89,14 +108,44 @@ class SupplierDashboardController extends Controller
     }
 
     /**
-     * Get inquiries count for supplier
-     * TODO: Implement when inquiry system is built
+     * Get inquiry statistics for supplier
+     */
+    private function getInquiryStats(Fournisseur $fournisseur)
+    {
+        $baseQuery = Inquiry::where('supplier_user_id', $fournisseur->user_id);
+        $allInquiries = $baseQuery->get();
+        
+        return [
+            'total' => $allInquiries->count(),
+            'new' => $allInquiries->where('status', 'new')->count(),
+            'read' => $allInquiries->where('status', 'read')->count(),
+            'responded' => $allInquiries->where('status', 'responded')->count(),
+            'closed' => $allInquiries->where('status', 'closed')->count(),
+            'this_month' => $allInquiries->where('created_at', '>=', now()->startOfMonth())->count(),
+            'this_week' => $allInquiries->where('created_at', '>=', now()->startOfWeek())->count(),
+            'high_priority' => $allInquiries->where('priority', 'high')->count(),
+            'urgent' => $allInquiries->where('priority', 'urgent')->count(),
+        ];
+    }
+
+    /**
+     * Get inquiries count for supplier (for backward compatibility)
      */
     private function getInquiriesCount(Fournisseur $fournisseur)
     {
-        // Placeholder - replace with real inquiry count when inquiry model exists
-        // return $fournisseur->inquiries()->where('created_at', '>=', now()->subMonth())->count();
-        return rand(5, 25); // Temporary random number for demo
+        return Inquiry::where('supplier_user_id', $fournisseur->user_id)
+            ->where('created_at', '>=', now()->subMonth())
+            ->count();
+    }
+
+    /**
+     * Get new inquiries count for supplier
+     */
+    private function getNewInquiriesCount(Fournisseur $fournisseur)
+    {
+        return Inquiry::where('supplier_user_id', $fournisseur->user_id)
+            ->where('status', 'new')
+            ->count();
     }
 
     /**
@@ -116,32 +165,62 @@ class SupplierDashboardController extends Controller
      */
     private function getRecentNotifications($user)
     {
-        // Placeholder for notifications - replace with real notification system
-        $sampleNotifications = collect([
-            (object) [
-                'id' => 1,
-                'message' => 'New inquiry received for your property in Bordeaux',
-                'type' => 'inquiry',
-                'created_at' => now()->subHours(2),
-                'read' => false
-            ],
-            (object) [
-                'id' => 2,
-                'message' => 'Your property listing "Premium Vineyard Land" was featured',
-                'type' => 'featured',
-                'created_at' => now()->subDay(),
-                'read' => false
-            ],
-            (object) [
-                'id' => 3,
-                'message' => 'Monthly analytics report is now available',
-                'type' => 'analytics',
-                'created_at' => now()->subDays(3),
-                'read' => true
-            ]
-        ]);
+        // Get real inquiry-based notifications
+        $inquiryNotifications = collect();
+        
+        if ($user->fournisseur) {
+            // Get recent new inquiries for notifications
+            $recentInquiries = Inquiry::where('supplier_user_id', $user->id)
+                ->where('status', 'new')
+                ->latest()
+                ->limit(3)
+                ->get();
+            
+            foreach ($recentInquiries as $inquiry) {
+                $inquiryNotifications->push((object) [
+                    'id' => $inquiry->id,
+                    'message' => "New inquiry received for: {$inquiry->subject}",
+                    'type' => 'inquiry',
+                    'created_at' => $inquiry->created_at,
+                    'read' => false,
+                    'url' => route('supplier.inquiries.show', $inquiry)
+                ]);
+            }
+        }
+        
+        // Add some placeholder notifications if no real ones exist
+        if ($inquiryNotifications->isEmpty()) {
+            $sampleNotifications = collect([
+                (object) [
+                    'id' => 1,
+                    'message' => 'Welcome to your supplier dashboard!',
+                    'type' => 'system',
+                    'created_at' => now()->subHours(1),
+                    'read' => false,
+                    'url' => '#'
+                ],
+                (object) [
+                    'id' => 2,
+                    'message' => 'Your profile is 85% complete. Add more details to attract clients.',
+                    'type' => 'profile',
+                    'created_at' => now()->subDay(),
+                    'read' => false,
+                    'url' => route('supplier.profile')
+                ],
+                (object) [
+                    'id' => 3,
+                    'message' => 'Tip: Add high-quality photos to your property listings for better engagement.',
+                    'type' => 'tip',
+                    'created_at' => now()->subDays(2),
+                    'read' => true,
+                    'url' => route('supplier.properties.index')
+                ]
+            ]);
+            
+            return $sampleNotifications->take(3);
+        }
 
-        return $sampleNotifications->take(3); // Show only 3 most recent
+        return $inquiryNotifications->take(3); // Show only 3 most recent
     }
 
     /**
@@ -168,6 +247,9 @@ class SupplierDashboardController extends Controller
             ->join('terres_agricoles', 'annonces.terre_agricole_id', '=', 'terres_agricoles.id')
             ->sum('terres_agricoles.surface');
 
+        // Get real inquiry statistics
+        $inquiryStats = $this->getInquiryStats($fournisseur);
+
         return response()->json([
             'stats' => [
                 'total_properties' => $fournisseur->annonces()->count(),
@@ -177,7 +259,9 @@ class SupplierDashboardController extends Controller
                 'total_surface' => $totalSurface,
                 'avg_price_per_hectare' => $totalSurface > 0 ? round($totalValue / $totalSurface, 2) : 0,
                 'monthly_views' => $this->getMonthlyViews($fournisseur),
-                'total_inquiries' => $this->getInquiriesCount($fournisseur),
+                'total_inquiries' => $inquiryStats['total'],
+                'new_inquiries' => $inquiryStats['new'],
+                'responded_inquiries' => $inquiryStats['responded'],
             ],
             'recent_properties' => $fournisseur->annonces()
                 ->with(['terreAgricole'])
@@ -195,6 +279,23 @@ class SupplierDashboardController extends Controller
                         'region' => $property->terreAgricole ? $property->terreAgricole->region : '',
                         'created_at' => $property->created_at->format('M d, Y'),
                         'updated_at' => $property->updated_at->diffForHumans(),
+                    ];
+                }),
+            'recent_inquiries' => Inquiry::where('supplier_user_id', $user->id)
+                ->with(['annonce'])
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(function($inquiry) {
+                    return [
+                        'id' => $inquiry->id,
+                        'subject' => $inquiry->subject,
+                        'client_name' => $inquiry->client_name,
+                        'status' => $inquiry->status,
+                        'priority' => $inquiry->priority,
+                        'property_title' => $inquiry->annonce->title ?? $inquiry->annonce->titre,
+                        'created_at' => $inquiry->created_at->format('M d, Y'),
+                        'time_since' => $inquiry->created_at->diffForHumans(),
                     ];
                 })
         ]);
@@ -216,10 +317,17 @@ class SupplierDashboardController extends Controller
             ]);
         }
 
+        $inquiryStats = $this->getInquiryStats($fournisseur);
+        
+        // Calculate response rate
+        $totalInquiries = $inquiryStats['total'];
+        $respondedInquiries = $inquiryStats['responded'];
+        $responseRate = $totalInquiries > 0 ? round(($respondedInquiries / $totalInquiries) * 100, 1) : 0;
+
         return response()->json([
             'properties' => $fournisseur->annonces()->count(),
-            'inquiries' => $this->getInquiriesCount($fournisseur),
-            'response_rate' => rand(85, 98) // TODO: Calculate real response rate
+            'inquiries' => $inquiryStats['new'], // Show new inquiries count
+            'response_rate' => $responseRate
         ]);
     }
 }

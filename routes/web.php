@@ -16,7 +16,7 @@ use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Supplier\SupplierDashboardController;
 use App\Http\Controllers\Supplier\PropertyController; // Add this line
 use App\Http\Middleware\AdminMiddleware;
-
+use App\Http\Controllers\Supplier\InquiryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -178,6 +178,19 @@ Route::put('/properties/{property}', [PropertyController::class, 'update'])->nam
 Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])->name('properties.destroy');
 Route::post('/properties/{property}/toggle-status', [PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
 Route::post('/properties/{property}/toggle-featured', [PropertyController::class, 'toggleFeatured'])->name('properties.toggle-featured');
+
+// Add these routes inside the existing supplier routes group in routes/web.php
+// After the properties routes, add:
+
+// Inquiries Routes
+Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
+Route::get('/inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
+Route::post('/inquiries/{inquiry}/update-status', [InquiryController::class, 'updateStatus'])->name('inquiries.update-status');
+Route::post('/inquiries/{inquiry}/update-priority', [InquiryController::class, 'updatePriority'])->name('inquiries.update-priority');
+Route::post('/inquiries/{inquiry}/send-response', [InquiryController::class, 'sendResponse'])->name('inquiries.send-response');
+Route::post('/inquiries/{inquiry}/mark-spam', [InquiryController::class, 'markAsSpam'])->name('inquiries.mark-spam');
+Route::delete('/inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
+Route::post('/inquiries/bulk-update', [InquiryController::class, 'bulkUpdate'])->name('inquiries.bulk-update');
 
     // Dashboard API endpoints
     Route::get('/api/dashboard-summary', [SupplierDashboardController::class, 'getDashboardSummary'])->name('api.dashboard-summary');

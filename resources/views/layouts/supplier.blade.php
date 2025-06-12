@@ -211,14 +211,26 @@
     <span class="font-medium">Add Property</span>
 </a>
                 
-                <a href="#" 
-                   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
-                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-envelope text-sm"></i>
-                    </div>
-                    <span class="font-medium">Inquiries</span>
-                    <span class="ml-auto text-xs bg-yellow-400 text-white px-2 py-1 rounded-full">5</span>
-                </a>
+               <!-- Replace the existing inquiries navigation link with: -->
+<!-- Replace the existing inquiries navigation link with: -->
+<a href="{{ route('supplier.inquiries.index') }}" 
+   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group {{ request()->routeIs('supplier.inquiries.*') ? 'bg-white bg-opacity-20' : '' }}">
+    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
+        <i class="fas fa-envelope text-sm"></i>
+    </div>
+    <span class="font-medium">Inquiries</span>
+    @php
+        $newInquiriesCount = 0;
+        if (auth()->check() && auth()->user()->fournisseur) {
+            $newInquiriesCount = \App\Models\Inquiry::where('supplier_user_id', auth()->id())
+                ->where('status', 'new')
+                ->count();
+        }
+    @endphp
+    @if($newInquiriesCount > 0)
+        <span class="ml-auto text-xs bg-yellow-400 text-white px-2 py-1 rounded-full">{{ $newInquiriesCount }}</span>
+    @endif
+</a>
                 
                 <a href="#" 
                    class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
