@@ -14,9 +14,11 @@ use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Supplier\SupplierDashboardController;
-use App\Http\Controllers\Supplier\PropertyController; // Add this line
-use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\Supplier\PropertyController;
 use App\Http\Controllers\Supplier\InquiryController;
+use App\Http\Controllers\Supplier\TransactionController as SupplierTransactionController;
+use App\Http\Middleware\AdminMiddleware;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -151,11 +153,6 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [ClientDashboardController::class, 'updateProfile'])->name('profile.update');
-    
-    // Add more client routes here as needed
-    // Route::get('/properties', [ClientPropertyController::class, 'index'])->name('properties.index');
-    // Route::get('/properties/{property}', [ClientPropertyController::class, 'show'])->name('properties.show');
-    // Route::post('/properties/{property}/inquire', [ClientPropertyController::class, 'inquire'])->name('properties.inquire');
 });
 
 /*
@@ -165,39 +162,45 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
 */
 
 Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(function () {
+    // Dashboard and Profile
     Route::get('/dashboard', [SupplierDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [SupplierDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [SupplierDashboardController::class, 'updateProfile'])->name('profile.update');
     
-   // Properties Routes
-Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
-Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
-Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
-Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
-Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
-Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])->name('properties.destroy');
-Route::post('/properties/{property}/toggle-status', [PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
-Route::post('/properties/{property}/toggle-featured', [PropertyController::class, 'toggleFeatured'])->name('properties.toggle-featured');
+    // Properties Routes
+    Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
+    Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
+    Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
+    Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+    Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])->name('properties.destroy');
+    Route::post('/properties/{property}/toggle-status', [PropertyController::class, 'toggleStatus'])->name('properties.toggle-status');
+    Route::post('/properties/{property}/toggle-featured', [PropertyController::class, 'toggleFeatured'])->name('properties.toggle-featured');
 
-// Add these routes inside the existing supplier routes group in routes/web.php
-// After the properties routes, add:
+    // Inquiries Routes
+    Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
+    Route::get('/inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
+    Route::post('/inquiries/{inquiry}/update-status', [InquiryController::class, 'updateStatus'])->name('inquiries.update-status');
+    Route::post('/inquiries/{inquiry}/update-priority', [InquiryController::class, 'updatePriority'])->name('inquiries.update-priority');
+    Route::post('/inquiries/{inquiry}/send-response', [InquiryController::class, 'sendResponse'])->name('inquiries.send-response');
+    Route::post('/inquiries/{inquiry}/mark-spam', [InquiryController::class, 'markAsSpam'])->name('inquiries.mark-spam');
+    Route::delete('/inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
+    Route::post('/inquiries/bulk-update', [InquiryController::class, 'bulkUpdate'])->name('inquiries.bulk-update');
 
-// Inquiries Routes
-Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
-Route::get('/inquiries/{inquiry}', [InquiryController::class, 'show'])->name('inquiries.show');
-Route::post('/inquiries/{inquiry}/update-status', [InquiryController::class, 'updateStatus'])->name('inquiries.update-status');
-Route::post('/inquiries/{inquiry}/update-priority', [InquiryController::class, 'updatePriority'])->name('inquiries.update-priority');
-Route::post('/inquiries/{inquiry}/send-response', [InquiryController::class, 'sendResponse'])->name('inquiries.send-response');
-Route::post('/inquiries/{inquiry}/mark-spam', [InquiryController::class, 'markAsSpam'])->name('inquiries.mark-spam');
-Route::delete('/inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
-Route::post('/inquiries/bulk-update', [InquiryController::class, 'bulkUpdate'])->name('inquiries.bulk-update');
+    // Analytics Routes
+    Route::get('/analytics', [SupplierDashboardController::class, 'analytics'])->name('analytics');
+    Route::get('/api/analytics-data', [SupplierDashboardController::class, 'getAnalyticsData'])->name('api.analytics-data');
+    Route::post('/api/export-report', [SupplierDashboardController::class, 'exportReport'])->name('api.export-report');
 
-Route::get('/analytics', [SupplierDashboardController::class, 'analytics'])->name('analytics');
-// Analytics API routes
-Route::get('/api/analytics-data', [SupplierDashboardController::class, 'getAnalyticsData'])->name('api.analytics-data');
-Route::post('/api/export-report', [SupplierDashboardController::class, 'exportReport'])->name('api.export-report');
-
-    // Dashboard API endpoints
+    // Transactions Routes - FIXED
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/export', [\App\Http\Controllers\Supplier\TransactionController::class, 'export'])->name('export');
+        Route::get('/', [\App\Http\Controllers\Supplier\TransactionController::class, 'index'])->name('index');
+        Route::get('/{transaction}', [\App\Http\Controllers\Supplier\TransactionController::class, 'show'])->name('show');
+    });
+    
+    // API Routes
+    Route::get('/api/transactions-analytics', [\App\Http\Controllers\Supplier\TransactionController::class, 'getAnalyticsData'])->name('api.transactions-analytics');
     Route::get('/api/dashboard-summary', [SupplierDashboardController::class, 'getDashboardSummary'])->name('api.dashboard-summary');
     Route::get('/api/quick-stats', [SupplierDashboardController::class, 'getQuickStats'])->name('api.quick-stats');
 });

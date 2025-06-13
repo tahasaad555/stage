@@ -243,13 +243,29 @@
     @endif
 </a>
 
-      <a href="#" 
-                   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
-                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-handshake text-sm"></i>
-                    </div>
-                    <span class="font-medium">Transactions</span>
-                </a>
+      <!-- Replace the existing transaction link in resources/views/layouts/supplier.blade.php with: -->
+
+<a href="{{ route('supplier.transactions.index') }}" 
+   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('supplier.transactions.*') ? 'bg-white bg-opacity-20 border-r-4 border-white' : '' }} group">
+    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
+        <i class="fas fa-handshake text-sm"></i>
+    </div>
+    <span class="font-medium">Transactions</span>
+    @php
+        $completedTransactionsCount = 0;
+        if (auth()->check() && auth()->user()->fournisseur) {
+            $completedTransactionsCount = auth()->user()->fournisseur->transactions()
+                ->where('status', 'completed')
+                ->count();
+        }
+    @endphp
+    @if($completedTransactionsCount > 0)
+        <span class="ml-auto text-xs bg-green-400 text-white px-2 py-1 rounded-full">{{ $completedTransactionsCount }}</span>
+    @endif
+    @if(request()->routeIs('supplier.transactions.*'))
+        <div class="ml-auto w-2 h-2 bg-white rounded-full"></div>
+    @endif
+</a>
                 
                 <!-- Account Section -->
                 <div class="px-4 py-2 mt-6">
