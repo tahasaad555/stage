@@ -183,10 +183,15 @@
                         <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                             <i class="fas fa-chart-bar text-white text-xl"></i>
                         </div>
-                        <div class="text-left">
-                            <h4 class="font-bold text-gray-800 group-hover:text-blue-700">View Analytics</h4>
-                            <p class="text-sm text-gray-600">Check property performance</p>
-                        </div>
+                       <a href="{{ route('supplier.analytics') }}" class="group flex items-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all border border-blue-200 hover:border-blue-300">
+    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+        <i class="fas fa-chart-bar text-white text-xl"></i>
+    </div>
+    <div class="text-left">
+        <h4 class="font-bold text-gray-800 group-hover:text-blue-700">View Analytics</h4>
+        <p class="text-sm text-gray-600">Check property performance</p>
+    </div>
+</a>
                     </button>
 
                     <button class="group flex items-center p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:from-purple-100 hover:to-pink-100 transition-all border border-purple-200 hover:border-purple-300">

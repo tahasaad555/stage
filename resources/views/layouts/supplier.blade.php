@@ -232,15 +232,18 @@
     @endif
 </a>
                 
-                <a href="#" 
-                   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
-                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-chart-bar text-sm"></i>
-                    </div>
-                    <span class="font-medium">Analytics</span>
-                </a>
-                
-                <a href="#" 
+     <a href="{{ route('supplier.analytics') }}" 
+   class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('supplier.analytics') ? 'bg-white bg-opacity-20 border-r-4 border-white' : '' }} group">
+    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
+        <i class="fas fa-chart-bar text-sm"></i>
+    </div>
+    <span class="font-medium">Analytics</span>
+    @if(request()->routeIs('supplier.analytics'))
+        <div class="ml-auto w-2 h-2 bg-white rounded-full"></div>
+    @endif
+</a>
+
+      <a href="#" 
                    class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
                     <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
                         <i class="fas fa-handshake text-sm"></i>

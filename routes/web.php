@@ -192,6 +192,11 @@ Route::post('/inquiries/{inquiry}/mark-spam', [InquiryController::class, 'markAs
 Route::delete('/inquiries/{inquiry}', [InquiryController::class, 'destroy'])->name('inquiries.destroy');
 Route::post('/inquiries/bulk-update', [InquiryController::class, 'bulkUpdate'])->name('inquiries.bulk-update');
 
+Route::get('/analytics', [SupplierDashboardController::class, 'analytics'])->name('analytics');
+// Analytics API routes
+Route::get('/api/analytics-data', [SupplierDashboardController::class, 'getAnalyticsData'])->name('api.analytics-data');
+Route::post('/api/export-report', [SupplierDashboardController::class, 'exportReport'])->name('api.export-report');
+
     // Dashboard API endpoints
     Route::get('/api/dashboard-summary', [SupplierDashboardController::class, 'getDashboardSummary'])->name('api.dashboard-summary');
     Route::get('/api/quick-stats', [SupplierDashboardController::class, 'getQuickStats'])->name('api.quick-stats');

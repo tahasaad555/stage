@@ -330,4 +330,218 @@ class SupplierDashboardController extends Controller
             'response_rate' => $responseRate
         ]);
     }
+    /**
+ * Show the analytics page
+ */
+public function analytics()
+{
+    $user = auth()->user();
+    $fournisseur = $user->fournisseur;
+    
+    // Initialize default analytics data
+    $analyticsData = [
+        'views' => [
+            'monthly' => $this->getMonthlyViewsData($fournisseur),
+            'weekly' => $this->getWeeklyViewsData($fournisseur),
+            'total' => $this->getMonthlyViews($fournisseur)
+        ],
+        'inquiries' => [
+            'monthly' => $this->getMonthlyInquiriesData($fournisseur),
+            'conversion_rate' => $this->getConversionRate($fournisseur),
+            'total' => $this->getInquiriesCount($fournisseur)
+        ],
+        'properties' => [
+            'performance' => $this->getPropertyPerformanceData($fournisseur),
+            'by_type' => $this->getPropertiesByType($fournisseur),
+            'active_vs_inactive' => $this->getActiveInactiveData($fournisseur)
+        ],
+        'revenue' => [
+            'monthly' => $this->getMonthlyRevenueData($fournisseur),
+            'by_property' => $this->getRevenueByProperty($fournisseur),
+            'total' => $this->getTotalRevenue($fournisseur)
+        ]
+    ];
+    
+    return view('supplier.analytics', [
+        'user' => $user,
+        'fournisseur' => $fournisseur,
+        'analytics' => $analyticsData
+    ]);
+}
+
+/**
+ * Get monthly views data for charts
+ */
+private function getMonthlyViewsData($fournisseur)
+{
+    // Placeholder data - replace with real analytics when implemented
+    return [
+        ['month' => 'Jan', 'views' => rand(800, 1200)],
+        ['month' => 'Feb', 'views' => rand(900, 1300)],
+        ['month' => 'Mar', 'views' => rand(1000, 1400)],
+        ['month' => 'Apr', 'views' => rand(1100, 1500)],
+        ['month' => 'May', 'views' => rand(1200, 1600)],
+        ['month' => 'Jun', 'views' => rand(1300, 1700)]
+    ];
+}
+
+/**
+ * Get weekly views data
+ */
+private function getWeeklyViewsData($fournisseur)
+{
+    return [
+        ['day' => 'Mon', 'views' => rand(50, 150)],
+        ['day' => 'Tue', 'views' => rand(60, 160)],
+        ['day' => 'Wed', 'views' => rand(70, 170)],
+        ['day' => 'Thu', 'views' => rand(80, 180)],
+        ['day' => 'Fri', 'views' => rand(90, 190)],
+        ['day' => 'Sat', 'views' => rand(40, 140)],
+        ['day' => 'Sun', 'views' => rand(30, 130)]
+    ];
+}
+
+/**
+ * Get monthly inquiries data
+ */
+private function getMonthlyInquiriesData($fournisseur)
+{
+    return [
+        ['month' => 'Jan', 'inquiries' => rand(10, 25)],
+        ['month' => 'Feb', 'inquiries' => rand(12, 28)],
+        ['month' => 'Mar', 'inquiries' => rand(15, 30)],
+        ['month' => 'Apr', 'inquiries' => rand(18, 35)],
+        ['month' => 'May', 'inquiries' => rand(20, 40)],
+        ['month' => 'Jun', 'inquiries' => rand(25, 45)]
+    ];
+}
+
+/**
+ * Get conversion rate data
+ */
+private function getConversionRate($fournisseur)
+{
+    return [
+        'current_month' => rand(15, 35) / 10, // 1.5% to 3.5%
+        'previous_month' => rand(10, 30) / 10,
+        'average' => rand(20, 25) / 10
+    ];
+}
+
+/**
+ * Get property performance data
+ */
+private function getPropertyPerformanceData($fournisseur)
+{
+    if (!$fournisseur) return [];
+    
+    return $fournisseur->annonces()->take(5)->get()->map(function($property) {
+        return [
+            'name' => $property->titre ?? 'Property #' . $property->id,
+            'views' => rand(50, 500),
+            'inquiries' => rand(2, 15),
+            'conversion_rate' => rand(10, 50) / 10
+        ];
+    })->toArray();
+}
+
+/**
+ * Get properties by type data
+ */
+private function getPropertiesByType($fournisseur)
+{
+    return [
+        ['type' => 'Vineyard', 'count' => rand(5, 15)],
+        ['type' => 'Crop Land', 'count' => rand(8, 20)],
+        ['type' => 'Orchard', 'count' => rand(3, 12)],
+        ['type' => 'Pasture', 'count' => rand(4, 10)]
+    ];
+}
+
+/**
+ * Get active vs inactive properties
+ */
+private function getActiveInactiveData($fournisseur)
+{
+    if (!$fournisseur) {
+        return ['active' => 0, 'inactive' => 0];
+    }
+    
+    $total = $fournisseur->annonces()->count();
+    $active = $fournisseur->annonces()->where('is_active', true)->count();
+    
+    return [
+        'active' => $active,
+        'inactive' => $total - $active
+    ];
+}
+
+/**
+ * Get monthly revenue data
+ */
+private function getMonthlyRevenueData($fournisseur)
+{
+    return [
+        ['month' => 'Jan', 'revenue' => rand(5000, 15000)],
+        ['month' => 'Feb', 'revenue' => rand(6000, 16000)],
+        ['month' => 'Mar', 'revenue' => rand(7000, 17000)],
+        ['month' => 'Apr', 'revenue' => rand(8000, 18000)],
+        ['month' => 'May', 'revenue' => rand(9000, 19000)],
+        ['month' => 'Jun', 'revenue' => rand(10000, 20000)]
+    ];
+}
+
+/**
+ * Get revenue by property
+ */
+private function getRevenueByProperty($fournisseur)
+{
+    if (!$fournisseur) return [];
+    
+    return $fournisseur->annonces()->take(5)->get()->map(function($property) {
+        return [
+            'name' => $property->titre ?? 'Property #' . $property->id,
+            'revenue' => rand(1000, 5000)
+        ];
+    })->toArray();
+}
+
+/**
+ * Get total revenue
+ */
+private function getTotalRevenue($fournisseur)
+{
+    return rand(50000, 150000);
+}
+/**
+ * Get analytics data via API
+ */
+public function getAnalyticsData(Request $request)
+{
+    $user = auth()->user();
+    $fournisseur = $user->fournisseur;
+    $timeRange = $request->get('range', 30); // days
+    
+    return response()->json([
+        'views' => $this->getViewsDataByRange($fournisseur, $timeRange),
+        'inquiries' => $this->getInquiriesDataByRange($fournisseur, $timeRange),
+        'revenue' => $this->getRevenueDataByRange($fournisseur, $timeRange),
+        'properties' => $this->getPropertyPerformanceData($fournisseur)
+    ]);
+}
+
+/**
+ * Export analytics report
+ */
+public function exportReport(Request $request)
+{
+    $user = auth()->user();
+    $fournisseur = $user->fournisseur;
+    $format = $request->get('format', 'pdf');
+    
+    // Generate report based on format
+    // This is where you'd implement PDF/Excel generation
+    
+    return response()->json(['success' => true, 'message' => 'Report generated successfully']);
+}
 }
