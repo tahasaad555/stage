@@ -18,6 +18,10 @@ use App\Http\Controllers\Supplier\PropertyController;
 use App\Http\Controllers\Supplier\InquiryController;
 use App\Http\Controllers\Supplier\TransactionController as SupplierTransactionController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\Client\ClientPropertyController;
+use App\Http\Controllers\Client\ClientInquiryController;
+use App\Http\Controllers\Client\ClientTransactionController;
+use App\Http\Controllers\Client\ClientSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,10 +153,51 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| Client Routes - COMPLETE IMPLEMENTATION
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| Client Routes - COMPLETE IMPLEMENTATION
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth'])->prefix('client')->name('client.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile Management
     Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [ClientDashboardController::class, 'updateProfile'])->name('profile.update');
+    
+    // Properties (Browse and View) - Updated to use annonces
+    Route::get('/properties', [ClientPropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/{annonce}', [ClientPropertyController::class, 'show'])->name('properties.show');
+    Route::post('/properties/{annonce}/inquire', [ClientPropertyController::class, 'sendInquiry'])->name('properties.inquire');
+    Route::post('/properties/{annonce}/toggle-save', [ClientPropertyController::class, 'toggleSave'])->name('properties.toggle-save');
+    
+    // Saved Properties
+    Route::get('/saved-properties', [ClientPropertyController::class, 'savedProperties'])->name('saved-properties');
+    
+    // Inquiries Management
+    Route::get('/inquiries', [ClientInquiryController::class, 'index'])->name('inquiries.index');
+    Route::get('/inquiries/{inquiry}', [ClientInquiryController::class, 'show'])->name('inquiries.show');
+    Route::patch('/inquiries/{inquiry}/close', [ClientInquiryController::class, 'markClosed'])->name('inquiries.close');
+    Route::delete('/inquiries/{inquiry}', [ClientInquiryController::class, 'destroy'])->name('inquiries.destroy');
+    
+    // Transactions
+    Route::get('/transactions', [ClientTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/{transaction}', [ClientTransactionController::class, 'show'])->name('transactions.show');
+    
+    // Settings
+    Route::get('/settings', [ClientSettingsController::class, 'index'])->name('settings');
+    Route::put('/settings', [ClientSettingsController::class, 'update'])->name('settings.update');
+    Route::post('/settings/change-password', [ClientSettingsController::class, 'changePassword'])->name('settings.change-password');
+    Route::post('/settings/delete-account', [ClientSettingsController::class, 'deleteAccount'])->name('settings.delete-account');
+
 });
 
 /*

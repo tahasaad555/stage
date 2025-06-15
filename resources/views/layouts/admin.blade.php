@@ -239,18 +239,7 @@
                     </div>
                 </a>
                 
-                <!-- Settings Section -->
-                <div class="px-4 py-2 mt-6">
-                    <span class="text-xs font-semibold text-gray-200 uppercase tracking-wide opacity-75">Settings</span>
-                </div>
-                
-                <a href="#" class="nav-item flex items-center px-6 py-3 text-white hover:bg-white hover:bg-opacity-10 group">
-                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-cog text-sm"></i>
-                    </div>
-                    <span class="font-medium">System Settings</span>
-                    <span class="ml-auto text-xs bg-yellow-500 text-white px-2 py-1 rounded-full">Soon</span>
-                </a>
+            
             </nav>
             
             <!-- Logout Section -->

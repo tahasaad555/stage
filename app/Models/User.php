@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+  use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -103,5 +104,66 @@ class User extends Authenticatable
     public function scopeByRole($query, $role)
     {
         return $query->where('role', $role);
+    }
+     /**
+     * Get the saved properties for the user.
+     */
+    public function savedProperties(): HasMany
+    {
+        return $this->hasMany(SavedProperty::class);
+    }
+
+    /**
+     * Get the inquiries sent by this client.
+     */
+    public function clientInquiries(): HasMany
+    {
+        return $this->hasMany(Inquiry::class, 'client_user_id');
+    }
+
+    /**
+     * Get the inquiries received by this supplier.
+     */
+    public function supplierInquiries(): HasMany
+    {
+        return $this->hasMany(Inquiry::class, 'supplier_user_id');
+    }
+
+    /**
+     * Check if user has saved a specific property/annonce.
+     */
+    public function hasSavedProperty($propertyId): bool
+    {
+        return $this->savedProperties()
+            ->where('property_id', $propertyId)
+            ->exists();
+    }
+
+    /**
+     * Save a property/annonce for this user.
+     */
+    public function saveProperty($propertyId): SavedProperty
+    {
+        return $this->savedProperties()->firstOrCreate([
+            'property_id' => $propertyId
+        ]);
+    }
+
+    /**
+     * Unsave a property/annonce for this user.
+     */
+    public function unsaveProperty($propertyId): bool
+    {
+        return $this->savedProperties()
+            ->where('property_id', $propertyId)
+            ->delete();
+    }
+
+    /**
+     * Get user's initials for avatar display.
+     */
+    public function getInitialsAttribute(): string
+    {
+        return strtoupper(substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1));
     }
 }
