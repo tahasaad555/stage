@@ -167,7 +167,7 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admi
 
 Route::middleware(['auth'])->prefix('client')->name('client.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
+ Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
     
     // Profile Management
     Route::get('/profile', [ClientDashboardController::class, 'profile'])->name('profile');
@@ -175,9 +175,16 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     
     // Properties (Browse and View) - Updated to use annonces
     Route::get('/properties', [ClientPropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/map', [ClientPropertyController::class, 'mapView'])->name('properties.map'); // NEW MAP ROUTE
     Route::get('/properties/{annonce}', [ClientPropertyController::class, 'show'])->name('properties.show');
     Route::post('/properties/{annonce}/inquire', [ClientPropertyController::class, 'sendInquiry'])->name('properties.inquire');
     Route::post('/properties/{annonce}/toggle-save', [ClientPropertyController::class, 'toggleSave'])->name('properties.toggle-save');
+    
+    // Additional property management routes
+    Route::post('/properties/{annonce}/report', [ClientPropertyController::class, 'reportProperty'])->name('properties.report');
+    Route::post('/properties/bulk-save', [ClientPropertyController::class, 'bulkSave'])->name('properties.bulk-save');
+    Route::post('/properties/bulk-remove', [ClientPropertyController::class, 'bulkRemove'])->name('properties.bulk-remove');
+    Route::get('/properties/export-saved', [ClientPropertyController::class, 'exportSaved'])->name('properties.export-saved');
     
     // Saved Properties
     Route::get('/saved-properties', [ClientPropertyController::class, 'savedProperties'])->name('saved-properties');
@@ -196,9 +203,9 @@ Route::middleware(['auth'])->prefix('client')->name('client.')->group(function (
     Route::get('/settings', [ClientSettingsController::class, 'index'])->name('settings');
     Route::put('/settings', [ClientSettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/change-password', [ClientSettingsController::class, 'changePassword'])->name('settings.change-password');
-    Route::post('/settings/delete-account', [ClientSettingsController::class, 'deleteAccount'])->name('settings.delete-account');
+    Route::post('/settings/delete-account', [ClientSettingsController::class, 'deleteAccount'])->name('settings.delete-account');});
 
-});
+
 
 /*
 |--------------------------------------------------------------------------

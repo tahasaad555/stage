@@ -27,68 +27,81 @@
         <!-- Saved Properties Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             @foreach($savedProperties as $savedProperty)
-                @php $property = $savedProperty->property; @endphp
+                @php 
+                    $property = $savedProperty->property ?? $savedProperty->annonce;
+                    $price = $property->prix ?: ($property->terreAgricole->price ?? 0);
+                    $location = $property->terreAgricole->region ?? 'Location not specified';
+                    $area = $property->terreAgricole->surface ?? 0;
+                @endphp
+                
                 <div class="glass-effect rounded-2xl overflow-hidden shadow-xl card-hover">
                     <!-- Property Image -->
-                    <div class="relative h-48 bg-gray-200">
-                        @if($property->images && $property->images->count() > 0)
-                            <img src="{{ $property->images->first()->image_url }}" 
-                                 alt="{{ $property->title }}"
+                    <div class="relative h-48 bg-gradient-to-r from-green-400 to-blue-500">
+                        @if($property->terreAgricole && $property->terreAgricole->photos && count($property->terreAgricole->photos) > 0)
+                            <img src="{{ asset('storage/' . $property->terreAgricole->photos[0]) }}" 
+                                 alt="{{ $property->titre ?: $property->title }}"
                                  class="w-full h-full object-cover">
                         @else
-                            <div class="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
-                                <i class="fas fa-home text-white text-4xl"></i>
+                            <div class="w-full h-full flex items-center justify-center">
+                                <i class="fas fa-seedling text-white text-4xl"></i>
                             </div>
                         @endif
                         
-                        <!-- Remove from Saved Button -->
+                        <!-- Featured Badge -->
+                        @if($property->is_featured)
+                            <div class="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                <i class="fas fa-star mr-1"></i>Featured
+                            </div>
+                        @endif
+
+                        <!-- Remove Button -->
                         <button onclick="removeSaved({{ $property->id }})" 
-                                class="absolute top-3 right-3 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all shadow-lg"
-                                title="Remove from saved">
+                                class="absolute top-4 right-4 w-10 h-10 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all flex items-center justify-center">
                             <i class="fas fa-times"></i>
                         </button>
-
-                        <!-- Property Type Badge -->
-                        <div class="absolute top-3 left-3">
-                            <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium capitalize">
-                                {{ str_replace('_', ' ', $property->property_type) }}
-                            </span>
-                        </div>
-
-                        <!-- Price Badge -->
-                        <div class="absolute bottom-3 left-3">
-                            <span class="bg-green-600 text-white px-3 py-2 rounded-lg font-bold">
-                                €{{ number_format($property->price) }}
-                            </span>
-                        </div>
-
-                        <!-- Saved Date -->
-                        <div class="absolute bottom-3 right-3">
-                            <span class="bg-white bg-opacity-90 text-gray-700 px-2 py-1 rounded text-xs font-medium">
-                                Saved {{ $savedProperty->created_at->diffForHumans() }}
-                            </span>
-                        </div>
                     </div>
 
-                    <!-- Property Details -->
+                    <!-- Property Content -->
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $property->title }}</h3>
-                        <p class="text-gray-600 mb-4 line-clamp-2">{{ Str::limit($property->description, 100) }}</p>
-                        
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center text-sm text-gray-600">
+                        <div class="mb-4">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $property->titre ?: $property->title }}</h3>
+                            
+                            <!-- Location -->
+                            <div class="flex items-center text-gray-600 mb-3">
                                 <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
-                                {{ $property->location }}
+                                <span>{{ $location }}</span>
                             </div>
-                            @if($property->area)
-                                <div class="flex items-center text-sm text-gray-600">
+
+                            <!-- Price -->
+                            <div class="text-2xl font-bold text-green-600 mb-3">
+                                {{ number_format($price) }} MAD
+                                @if($area > 0)
+                                    <div class="text-sm text-gray-600 font-normal">
+                                        {{ number_format($price / $area) }} MAD/hectare
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Area -->
+                            @if($area > 0)
+                                <div class="flex items-center text-sm text-gray-600 mb-3">
                                     <i class="fas fa-ruler-combined mr-2 text-green-500"></i>
-                                    {{ number_format($property->area) }} {{ $property->area_unit ?? 'hectares' }}
+                                    <span>{{ number_format($area, 1) }} hectares</span>
                                 </div>
                             @endif
+
+                            <!-- Soil Type -->
+                            @if($property->terreAgricole && $property->terreAgricole->soil_type)
+                                <div class="flex items-center text-sm text-gray-600 mb-3">
+                                    <i class="fas fa-seedling mr-2 text-brown-500"></i>
+                                    <span class="capitalize">{{ $property->terreAgricole->soil_type }} soil</span>
+                                </div>
+                            @endif
+
+                            <!-- Supplier -->
                             <div class="flex items-center text-sm text-gray-600">
                                 <i class="fas fa-user mr-2 text-purple-500"></i>
-                                {{ $property->user->fournisseur->company_name ?? $property->user->full_name }}
+                                {{ $property->fournisseur->company_name ?? $property->fournisseur->user->full_name ?? 'N/A' }}
                             </div>
                         </div>
 
@@ -97,7 +110,7 @@
                                class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all font-medium text-center">
                                 <i class="fas fa-eye mr-2"></i>View Details
                             </a>
-                            <button onclick="showInquiryModal({{ $property->id }}, '{{ $property->title }}')" 
+                            <button onclick="showInquiryModal({{ $property->id }}, '{{ $property->titre ?: $property->title }}')" 
                                     class="bg-green-600 text-white py-3 px-4 rounded-xl hover:bg-green-700 transition-all">
                                 <i class="fas fa-envelope"></i>
                             </button>
@@ -182,37 +195,36 @@
                 </div>
                 
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Budget Range (MAD)</label>
+                    <select name="budget_range" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select budget range</option>
+                        <option value="<100000">< 100,000 MAD</option>
+                        <option value="100000-500000">100,000 - 500,000 MAD</option>
+                        <option value="500000-1000000">500,000 - 1,000,000 MAD</option>
+                        <option value="1000000-5000000">1,000,000 - 5,000,000 MAD</option>
+                        <option value=">5000000">> 5,000,000 MAD</option>
+                    </select>
+                </div>
+                
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
                     <textarea name="message" rows="4" 
-                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                              placeholder="Tell us about your interest in this property..." 
+                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Please provide details about your inquiry..."
                               required></textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
-                        <select name="budget_range" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Not specified</option>
-                            <option value="€50,000 - €100,000">€50,000 - €100,000</option>
-                            <option value="€100,000 - €250,000">€100,000 - €250,000</option>
-                            <option value="€250,000 - €500,000">€250,000 - €500,000</option>
-                            <option value="€500,000+">€500,000+</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                        <select name="priority" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                                required>
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select name="priority" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                            required>
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
                 </div>
                 
                 <div class="flex space-x-3 pt-4">
@@ -230,9 +242,16 @@
     </div>
 
     <script>
-        // Remove from saved
+        // Remove from saved with confirmation
         function removeSaved(propertyId) {
             if (confirm('Are you sure you want to remove this property from your saved list?')) {
+                const btn = event.target.closest('button');
+                const originalContent = btn.innerHTML;
+                
+                // Show loading state
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                
                 fetch(`/client/properties/${propertyId}/toggle-save`, {
                     method: 'POST',
                     headers: {
@@ -244,14 +263,26 @@
                 .then(data => {
                     if (data.action === 'removed') {
                         showToast(data.message, 'success');
-                        // Reload page to update the list
+                        // Remove the property card with animation
+                        const propertyCard = btn.closest('.glass-effect');
+                        propertyCard.style.transition = 'all 0.3s ease';
+                        propertyCard.style.opacity = '0';
+                        propertyCard.style.transform = 'scale(0.9)';
+                        
                         setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                            propertyCard.remove();
+                            updateSavedCount();
+                        }, 300);
+                    } else {
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                        showToast('Could not remove property. Please try again.', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
                     showToast('An error occurred. Please try again.', 'error');
                 });
             }
@@ -270,15 +301,91 @@
             document.getElementById('inquiryModal').classList.add('hidden');
         }
 
-        // Export saved properties
+        // Enhanced export saved properties
         function exportSaved() {
-            showToast('Export functionality will be implemented soon.', 'info');
+            showToast('Preparing export...', 'info');
+            
+            // Use the backend export route
+            window.location.href = '{{ route("client.properties.export-saved") }}';
+            
+            setTimeout(() => {
+                showToast('Export download started!', 'success');
+            }, 1000);
         }
 
-        // Clear all saved properties
+        // Enhanced clear all saved properties
         function clearAllSaved() {
-            if (confirm('Are you sure you want to remove ALL saved properties? This action cannot be undone.')) {
-                showToast('Clear all functionality will be implemented soon.', 'info');
+            const savedCount = document.querySelectorAll('.glass-effect').length;
+            
+            if (savedCount === 0) {
+                showToast('No saved properties to clear.', 'info');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to remove ALL ${savedCount} saved properties? This action cannot be undone.`)) {
+                const clearBtn = event.target;
+                const originalContent = clearBtn.innerHTML;
+                
+                // Show loading state
+                clearBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Clearing...';
+                clearBtn.disabled = true;
+                
+                // Get all property IDs
+                const propertyIds = [];
+                document.querySelectorAll('[onclick^="showInquiryModal"]').forEach(btn => {
+                    const match = btn.getAttribute('onclick').match(/showInquiryModal\((\d+)/);
+                    if (match) {
+                        propertyIds.push(match[1]);
+                    }
+                });
+                
+                // Use bulk remove API
+                fetch('/client/properties/bulk-remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        property_ids: propertyIds
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    clearBtn.innerHTML = originalContent;
+                    clearBtn.disabled = false;
+                    
+                    if (data.success) {
+                        showToast(`Successfully removed ${data.removed_count} properties.`, 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showToast('Error clearing properties. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearBtn.innerHTML = originalContent;
+                    clearBtn.disabled = false;
+                    showToast('An error occurred. Please try again.', 'error');
+                });
+            }
+        }
+
+        // Update saved count display
+        function updateSavedCount() {
+            const remainingCount = document.querySelectorAll('.glass-effect').length;
+            const countDisplay = document.querySelector('.text-3xl.font-bold');
+            if (countDisplay) {
+                countDisplay.textContent = remainingCount;
+            }
+            
+            // Show empty state if no properties left
+            if (remainingCount === 0) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             }
         }
 
@@ -299,14 +406,13 @@
             
             document.body.appendChild(toast);
             
-            setTimeout(() => {
-                toast.classList.remove('translate-x-full');
-            }, 100);
             
             setTimeout(() => {
                 toast.classList.add('translate-x-full');
                 setTimeout(() => {
-                    document.body.removeChild(toast);
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
                 }, 300);
             }, 3000);
         }

@@ -39,19 +39,19 @@ class SavedProperty extends Model
     }
 
     /**
-     * Get the property that was saved.
+     * Get the property that was saved - FIXED to use correct relationship
      */
     public function property(): BelongsTo
     {
-        return $this->belongsTo(Annonce::class, 'property_id'); // Reference Annonce model
+        return $this->belongsTo(Annonce::class, 'property_id', 'id');
     }
 
     /**
-     * Alternative relationship name for clarity.
+     * Alternative relationship name for clarity - FIXED
      */
     public function annonce(): BelongsTo
     {
-        return $this->belongsTo(Annonce::class, 'property_id');
+        return $this->belongsTo(Annonce::class, 'property_id', 'id');
     }
 
     /**
@@ -68,5 +68,15 @@ class SavedProperty extends Model
     public function scopeRecent($query, $days = 30)
     {
         return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
+    /**
+     * Scope to get saved properties with active listings only
+     */
+    public function scopeActiveProperties($query)
+    {
+        return $query->whereHas('property', function($q) {
+            $q->where('is_active', true);
+        });
     }
 }
